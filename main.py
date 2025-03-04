@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from inventario import escanear_producto, agregar_producto, cargar_inventario, modificar_producto, eliminar, guardar_inventario
+from inventario import escanear_alumno, agregar_alumno, cargar_alumnos, modificar_alumno, eliminar, guardar_alumno
 from ventadiaria import guardar_venta_diaria
 import datetime
 import serial
@@ -13,11 +13,11 @@ from tkinter import BooleanVar
 class InventarioApp:
     def __init__(self, master):
         self.master = master
-        master.title("SATO APP")
+        master.title("QUE VIVA EL FUTBOL")
         self.ventanaagregar = False
-        self.ventanaInventario = False
-        self.editando_producto = False
-        self.lista_productos = []
+        self.ventanaAlumnos = False
+        self.editando_alumno = False
+        self.lista_alumnos = []
         self.venta_finalizada = False
         self.ventanavender = False
         self.ventanacaja = False
@@ -39,16 +39,16 @@ class InventarioApp:
         self.buttons_frame.pack(pady=20)
         self.caja_icon = self.caja_icon.subsample(10,10)
 
-        self.add_button = tk.Button(self.buttons_frame, text="Agregar Nuevo Producto", image=self.add_icon, compound=tk.LEFT, command=self.mostrar_ventana_agregar,  state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
+        self.add_button = tk.Button(self.buttons_frame, text="Agregar Alumno", image=self.add_icon, compound=tk.LEFT, command=self.mostrar_ventana_agregar,  state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.add_button.pack(side=tk.LEFT, padx=10)
 
-        self.sell_button = tk.Button(self.buttons_frame, text="Vender", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cobrar)
+        self.sell_button = tk.Button(self.buttons_frame, text="Cobrar", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cobrar)
         self.sell_button.pack(side=tk.LEFT, padx=10)
 
-        self.view_button = tk.Button(self.buttons_frame, text="Ver Inventario", image=self.view_icon, compound=tk.LEFT, command=self.mostrar_ventana_inventario)
+        self.view_button = tk.Button(self.buttons_frame, text="Lista Alumnos", image=self.view_icon, compound=tk.LEFT, command=self.mostrar_ventana_alumnos)
         self.view_button.pack(side=tk.LEFT, padx=10)
 
-        self.caja_button = tk.Button(self.buttons_frame, text="Caja", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_caja)
+        self.caja_button = tk.Button(self.buttons_frame, text="Cierre de Caja", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_caja)
         self.caja_button.pack(side=tk.LEFT, padx=10)
         # Añadir el switch de restricción
         self.restrict_switch = tk.Checkbutton(self.master, text="Modo Restricción", variable=self.restrict_mode, command=self.toggle_restriccion)
@@ -133,7 +133,7 @@ class InventarioApp:
 
 
     def verificar_contraseña(self):
-        contraseña_correcta = "satomultirubro"  # Reemplaza esto con la contraseña correcta
+        contraseña_correcta = "beto1986"  # Reemplaza esto con la contraseña correcta
         if self.entry_contraseña.get() == contraseña_correcta:
             self.restrict_mode.set(False)
             self.add_button.config(state=tk.NORMAL)
@@ -323,68 +323,75 @@ class InventarioApp:
         
 
 
-    def mostrar_ventana_agregar(self, editar=False, nombre="", codigo="", cantidad="", precio=""):
+    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota=""):
         if self.ventanaagregar is not False:
             return
-        
+
         self.previous_window = self.master.focus_get()
         self.ventanaagregar = True
         self.ventana_agregar = tk.Toplevel(self.master)
-        self.ventana_agregar.title("Agregar Nuevo Producto" if not editar else "Editar Producto")
-        #self.ventana_agregar.iconbitmap("images\\add.ico") 
+        self.ventana_agregar.title("Agregar Nuevo Alumno" if not editar else "Editar Alumno")
 
         def cerrar_ventana():
             self.toggleAgregar()  # Llama al método toggleAgregar cuando se cierra la ventana
             self.ventana_agregar.destroy()
-            self.editando_producto=False
-        
+            self.editando_alumno=False
+
         self.ventana_agregar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
 
         # Crear el frame principal para centrar todos los widgets
         main_frame = tk.Frame(self.ventana_agregar, padx=10, pady=10)
         main_frame.pack(expand=True, fill=tk.BOTH)
 
+        # Campo Nombre
         tk.Label(main_frame, text="Nombre:", font=("Arial", 14)).grid(row=0, column=0, padx=10, pady=5, sticky=tk.E)
         self.nombre_entry = tk.Entry(main_frame, font=("Arial", 14))
         self.nombre_entry.focus_set()
         self.nombre_entry.grid(row=0, column=1, padx=10, pady=5)
         self.nombre_entry.insert(tk.END, nombre)
 
-        tk.Label(main_frame, text="Código de Barras:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
-        self.codigo_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.codigo_entry.grid(row=1, column=1, padx=10, pady=5)
-        if codigo:
-            self.codigo_entry.insert(tk.END, codigo)
+        # Campo Apellido
+        tk.Label(main_frame, text="Apellido:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+        self.apellido_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.apellido_entry.grid(row=1, column=1, padx=10, pady=5)
+        self.apellido_entry.insert(tk.END, apellido)
 
-        tk.Label(main_frame, text="Cantidad:", font=("Arial", 14)).grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
-        self.cantidad_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.cantidad_entry.grid(row=2, column=1, padx=10, pady=5)
-        self.cantidad_entry.insert(tk.END, cantidad)
+        # Campo DNI
+        tk.Label(main_frame, text="DNI:", font=("Arial", 14)).grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
+        self.dni_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.dni_entry.grid(row=2, column=1, padx=10, pady=5)
+        self.dni_entry.insert(tk.END, dni)
 
-        tk.Label(main_frame, text="Precio:", font=("Arial", 14)).grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
-        self.precio_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.precio_entry.grid(row=3, column=1, padx=10, pady=5)
-        self.precio_entry.insert(tk.END, precio)
+        # Campo Categoría
+        tk.Label(main_frame, text="Categoría:", font=("Arial", 14)).grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
+        self.categoria_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.categoria_entry.grid(row=3, column=1, padx=10, pady=5)
+        self.categoria_entry.insert(tk.END, categoria)
+
+        # Campo Cuota
+        tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
+        self.cuota_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.cuota_entry.grid(row=4, column=1, padx=10, pady=5)
+        self.cuota_entry.insert(tk.END, cuota)
 
         botones_frame = tk.Frame(main_frame)
-        botones_frame.grid(row=4, column=0, columnspan=2, pady=10)
+        botones_frame.grid(row=5, column=0, columnspan=2, pady=10)
 
         if editar:
-            guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_producto_editado(codigo))
+            guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_alumno_editado(dni))
             guardar_button.pack(side=tk.LEFT, padx=5)
-            eliminar_button = tk.Button(botones_frame, text="Eliminar", font=("Arial", 14), command=lambda: self.eliminar_producto(codigo))
+            eliminar_button = tk.Button(botones_frame, text="Eliminar", font=("Arial", 14), command=lambda: self.eliminar_alumno(dni))
             eliminar_button.pack(side=tk.LEFT, padx=5)
-            
+
         else:
-            agregar_button = tk.Button(botones_frame, text="Agregar", font=("Arial", 14), command=self.agregar_producto)
+            agregar_button = tk.Button(botones_frame, text="Agregar", font=("Arial", 14), command=self.agregar_alumno)
             agregar_button.pack(side=tk.LEFT, padx=5)
-            
 
         # Centrar la ventana en la pantalla
         self.ventana_agregar.update_idletasks()
         width = self.ventana_agregar.winfo_width()
         height = self.ventana_agregar.winfo_height()
-        
+
         x = (self.ventana_agregar.winfo_screenwidth() // 2) - (width // 2)
         y = (self.ventana_agregar.winfo_screenheight() // 2) - (height // 2)
         self.ventana_agregar.geometry(f"{width}x{height}+{x}+{y-100}")
@@ -400,7 +407,7 @@ class InventarioApp:
             return
         self.venta_finalizada = False
         self.carrito = {}  # Reiniciar el carrito aquí
-        self.lista_productos = []
+        self.lista_alumnos = []
         self.total = 0
         self.ventanavender = True
         ventana_cobrar = tk.Toplevel(self.master)
@@ -533,24 +540,24 @@ class InventarioApp:
 
 
 
-    def mostrar_ventana_inventario(self):
-        if self.ventanaInventario is not False:
+    def mostrar_ventana_alumnos(self):
+        if self.ventanaAlumnos is not False:
             return
         self.previous_window = self.master.focus_get()  # Guardar la ventana activa actual
-        self.ventanaInventario = True
-        self.ventana_inventario = tk.Toplevel(self.master)
-        self.ventana_inventario.title("Ver Inventario")
-        #self.ventana_inventario.iconbitmap("images\\boxes.ico") 
+        self.ventanaAlumnos = True
+        self.ventana_alumnos = tk.Toplevel(self.master)
+        self.ventana_alumnos.title("Alumnos")
+        #self.ventana_alumnos.iconbitmap("images\\boxes.ico") 
 
         def cerrar_ventana():
-            self.toggleInventario()
-            self.ventana_inventario.destroy()
+            self.toggleAlumnos()
+            self.ventana_alumnos.destroy()
 
-        self.ventana_inventario.protocol("WM_DELETE_WINDOW", cerrar_ventana)
+        self.ventana_alumnos.protocol("WM_DELETE_WINDOW", cerrar_ventana)
 
         # Obtener el tamaño de la pantalla
-        screen_width = self.ventana_inventario.winfo_screenwidth()
-        screen_height = self.ventana_inventario.winfo_screenheight()
+        screen_width = self.ventana_alumnos.winfo_screenwidth()
+        screen_height = self.ventana_alumnos.winfo_screenheight()
 
         # Obtener el tamaño de la ventana
         window_width = 900  # Ajusta el ancho de la ventana
@@ -561,10 +568,10 @@ class InventarioApp:
         y = (screen_height // 2) - (window_height // 2)
 
         # Establecer la geometría de la ventana para que aparezca en el centro
-        self.ventana_inventario.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        self.ventana_alumnos.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
         # Frame para la entrada y el botón de búsqueda
-        search_frame = tk.Frame(self.ventana_inventario)
+        search_frame = tk.Frame(self.ventana_alumnos)
         search_frame.pack(pady=10)
 
         label_buscar = tk.Label(search_frame, text="Buscar por nombre o por código de barras:", font=("Arial", 14))
@@ -574,40 +581,49 @@ class InventarioApp:
         self.entry_buscar = tk.Entry(search_frame, font=("Arial", 14))
         self.entry_buscar.pack(side=tk.LEFT, padx=5)
 
-        self.entry_buscar.bind("<Return>", lambda event: self.buscar_producto())
+        self.entry_buscar.bind("<Return>", lambda event: self.buscar_alumno())
 
         # Botón de búsqueda
-        buscar_button = tk.Button(search_frame, text="Buscar", font=("Arial", 14), command=self.buscar_producto)
+        buscar_button = tk.Button(search_frame, text="Buscar", font=("Arial", 14), command=self.buscar_alumno)
         buscar_button.pack(side=tk.LEFT, padx=5)
         
 
-        # Árbol de productos
-        self.tree = ttk.Treeview(self.ventana_inventario)
-        self.tree['columns'] = ('Cantidad', 'Nombre', 'Código de Barras', 'Precio')
+        # Árbol de alumnos
+        self.tree = ttk.Treeview(self.ventana_alumnos)
+        self.tree['columns'] = ('DNI', 'Nombre', 'Apellido', 'Categoría', 'Cuota')
 
-        self.tree.column('#0', width=0, stretch=tk.NO)
-        self.tree.column('Cantidad', anchor=tk.CENTER, width=200)
-        self.tree.column('Nombre', anchor=tk.W, width=250)
-        self.tree.column('Código de Barras', anchor=tk.CENTER, width=200)
-        self.tree.column('Precio', anchor=tk.CENTER, width=200)
+        # Definir las columnas
+        self.tree.column('#0', width=0, stretch=tk.NO)  # Columna invisible
+        self.tree.column('DNI', anchor=tk.CENTER, width=150)
+        self.tree.column('Nombre', anchor=tk.W, width=200)
+        self.tree.column('Apellido', anchor=tk.W, width=200)
+        self.tree.column('Categoría', anchor=tk.CENTER, width=100)
+        self.tree.column('Cuota', anchor=tk.CENTER, width=150)
 
+        # Definir los encabezados
         self.tree.heading('#0', text='', anchor=tk.W)
-        self.tree.heading('Cantidad', text='Cantidad', anchor=tk.CENTER)
+        self.tree.heading('DNI', text='DNI', anchor=tk.CENTER)
         self.tree.heading('Nombre', text='Nombre', anchor=tk.W)
-        self.tree.heading('Código de Barras', text='Código de Barras', anchor=tk.CENTER)
-        self.tree.heading('Precio', text='Precio', anchor=tk.CENTER)
+        self.tree.heading('Apellido', text='Apellido', anchor=tk.W)
+        self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER)
+        self.tree.heading('Cuota', text='Cuota', anchor=tk.CENTER)
+
+        # Establecer el tamaño de la altura de las filas
         self.tree['height'] = 20
 
-        productos = cargar_inventario()
-        for codigo, datos in productos.items():
-            self.tree.insert('', tk.END, values=(datos['cantidad'], datos['nombre'], codigo, datos['precio']))
+        # Obtener los datos de los alumnos (deberías tener una función que los devuelva)
+        alumnos = cargar_alumnos()  # Esta función debería devolver los alumnos en formato adecuado
 
+        for alumno in alumnos:
+            self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
 
+        # Si no hay modo restrictivo, vincular el evento de doble clic para editar un alumno
         if not self.restrict_mode.get():
-            self.tree.bind("<Double-1>", self.editar_producto)  # Vincular evento de doble clic para editar producto
+            self.tree.bind("<Double-1>", modificar_alumno)  # Vincular evento de doble clic para editar alumno
 
-
+        # Empacar el árbol en la ventana
         self.tree.pack(pady=20)
+
     
     def resource_path(self, relative_path):
         """ Obtiene la ruta absoluta al recurso, funciona para desarrollo y para el ejecutable compilado. """
@@ -651,28 +667,65 @@ class InventarioApp:
 
 
 
-    def agregar_producto(self):
-        codigo_de_barras = self.codigo_entry.get()
+    def agregar_alumno(self):
+        # Obtener los valores de los campos de entrada
         nombre = self.nombre_entry.get()
-        nombre= nombre.upper()
-        try:
-            precio = float(self.precio_entry.get())
-            cantidad = int(self.cantidad_entry.get())
-        except ValueError:
-            messagebox.showerror("Error", "Precio y cantidad deben ser números.")
+        apellido = self.apellido_entry.get()
+        dni = self.dni_entry.get()
+        categoria = self.categoria_entry.get()
+        cuota = self.cuota_entry.get()
+
+        # Validaciones
+        if not nombre or not apellido or not dni or not categoria or not cuota:
+            messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
-        if agregar_producto(codigo_de_barras, nombre, precio, cantidad):
-            messagebox.showinfo("Éxito", "Producto agregado al inventario.")
-            self.ventana_agregar.destroy()
-            self.toggleAgregar()
-            if self.ventanaInventario:
-                self.ventana_inventario.focus_force()
-                self.actualizar_vista_inventario()
-            else:
-                self.previous_window.focus_force()
+        # Validar que la categoría sea un año de nacimiento válido
+        try:
+            categoria = int(categoria)
+            current_year = datetime.datetime.now().year
+            if categoria < 1900 or categoria > current_year:
+                raise ValueError("El año de nacimiento debe ser entre 1900 y el año actual.")
+        except ValueError as e:
+            messagebox.showerror("Error", f"Categoría inválida: {str(e)}")
+            return
+
+        # Validar la cuota
+        cuota_estado = cuota.lower().strip()
+        if cuota_estado not in ["al día", "moroso"]:
+            messagebox.showerror("Error", "La cuota debe ser 'al día' o 'moroso'.")
+            return
+
+        # Verificar si el alumno ya existe
+        if self.alumno_existente(dni):
+            messagebox.showerror("Error", "El alumno con este DNI ya está registrado.")
+            return
+
+
+
+        agregar_alumno(dni,nombre,apellido,categoria,cuota_estado)
+
+        # Mostrar mensaje de éxito
+        messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
+        self.ventana_agregar.destroy()
+        self.toggleAgregar()
+
+        # Actualizar la vista de alumnos si es necesario
+        if self.ventanaAlumnos:
+            self.ventana_alumnos.focus_force()
+            self.actualizar_vista_alumnos()
         else:
-            messagebox.showerror("Error", "El producto ya existe en el inventario.")
+            self.previous_window.focus_force()
+
+    def alumno_existente(self, dni):
+        # Verifica si el alumno ya está registrado por su DNI
+        # Aquí puedes buscar en tu lista de alumnos o base de datos
+        for alumno in self.lista_alumnos:
+            if alumno['dni'] == dni:
+                return True
+        return False
+
+
             
     def imprimir_ticket(self):
         now = datetime.datetime.now()
@@ -692,7 +745,7 @@ class InventarioApp:
         contador = {}
 
         # Contar las ocurrencias de cada producto
-        for item in self.lista_productos:
+        for item in self.lista_alumnos:
             nombre = item['nombre']
             if nombre in contador:
                 contador[nombre]['cantidad'] += 1
@@ -749,7 +802,7 @@ class InventarioApp:
         if codigo_de_barras:
             producto = escanear_producto(codigo_de_barras)
             if producto:
-                self.lista_productos.append(producto)
+                self.lista_alumnos.append(producto)
                 self.total += producto['precio']
                 self.output_text_cobrar.insert(tk.END, f"Producto añadido: {producto['nombre']} - ${producto['precio']:.2f}\n")
 
@@ -797,7 +850,7 @@ class InventarioApp:
 
         # Para evitar duplicados y mostrar cantidades correctamente
         productos_unicos = {}
-        for producto in self.lista_productos:
+        for producto in self.lista_alumnos:
             nombre = producto['nombre']
             if nombre in productos_unicos:
                 productos_unicos[nombre]['cantidad'] += 1
@@ -844,8 +897,8 @@ class InventarioApp:
 
        
 
-    def toggleInventario(self):
-        self.ventanaInventario = False
+    def toggleAlumnos(self):
+        self.ventanaAlumnos = False
 
     def toggleAgregar(self):
         self.ventanaagregar = False    
@@ -874,11 +927,11 @@ class InventarioApp:
         if eliminar(codigo):
             messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
             self.ventana_agregar.destroy()
-            self.actualizar_vista_inventario()
+            self.actualizar_vista_alumnos()
             self.editando_producto = False
             self.toggleAgregar()
-            if self.ventanaInventario:
-                self.ventana_inventario.focus_force()
+            if self.ventanaAlumnos:
+                self.ventana_alumnos.focus_force()
             else:
                 self.previous_window.focus_force()
 
@@ -905,11 +958,11 @@ class InventarioApp:
         if modificar_producto(codigo, nombre, precio, cantidad, codigonuevo):
             messagebox.showinfo("Éxito", "Producto editado correctamente.")
             self.ventana_agregar.destroy()
-            self.actualizar_vista_inventario()
+            self.actualizar_vista_alumnos()
             self.toggleAgregar()
             self.editando_producto = False
-            if self.ventanaInventario:
-                self.ventana_inventario.focus_force()
+            if self.ventanaAlumnos:
+                self.ventana_alumnos.focus_force()
             else:
                 self.previous_window.focus_force()
         else:
@@ -918,7 +971,7 @@ class InventarioApp:
             self.editando_producto = False
 
 
-    def buscar_producto(self):
+    def buscar_alumno(self):
         # Limpiar árbol
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -933,17 +986,18 @@ class InventarioApp:
                 self.tree.insert('', tk.END, values=(datos['cantidad'], datos['nombre'], codigo, datos['precio']))
         
 
-    def actualizar_vista_inventario(self):
-            # Limpiar árbol
-            for item in self.tree.get_children():
-                self.tree.delete(item)
+    def actualizar_vista_alumnos(self):
+        # Limpiar árbol
+        for item in self.tree.get_children():
+            self.tree.delete(item)
 
-            # Obtener los productos del inventario actualizado
-            productos = cargar_inventario()
+        # Obtener los alumnos actualizados (deberías tener una función que los devuelva)
+        alumnos = self.cargar_alumnos()  # Esta función debe devolver los alumnos en formato adecuado
 
-            # Mostrar los productos en el árbol
-            for codigo, datos in productos.items():
-                self.tree.insert('', tk.END, values=(datos['cantidad'], datos['nombre'], codigo, datos['precio']))
+        # Mostrar los alumnos en el árbol
+        for alumno in alumnos:
+            self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
+
 
 
 # Crear la ventana principal de la aplicación

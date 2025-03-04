@@ -1,55 +1,81 @@
 import json
 
-# Archivo JSON para el inventario
-INVENTARIO_FILE = 'inventario.json'
+# Archivo JSON para el alumno
+alumnos_FILE = 'alumnos.json'
 
-# Función para cargar el inventario desde el archivo JSON
-def cargar_inventario():
+# Función para cargar el alumno desde el archivo JSON
+def cargar_alumnos():
     try:
-        with open(INVENTARIO_FILE, 'r') as file:
+        with open(alumnos_FILE, 'r') as file:
+            print(json.load(file))
             return json.load(file)
     except FileNotFoundError:
         return {}
 
-# Función para guardar el inventario en el archivo JSON
-def guardar_inventario(inventario):
-    with open(INVENTARIO_FILE, 'w') as file:
-        json.dump(inventario, file, indent=4)
+# Función para guardar el alumno en el archivo JSON
+def guardar_alumno(alumno):
+    with open(alumnos_FILE, 'w') as file:
+        print("holaaaaa")
+        json.dump(alumno, file, indent=4)
 
-# Función para escanear un producto
-def escanear_producto(codigo_de_barras):
-    inventario = cargar_inventario()
-    return inventario.get(codigo_de_barras, None)
+# Función para escanear un alumno
+def escanear_alumno(codigo_de_barras):
+    alumno = cargar_alumnos()
+    return alumno.get(codigo_de_barras, None)
 
-# Función para modificar un producto
-def modificar_producto(codigo, nombre, precio, cantidad, codigonuevo):
-    inventario = cargar_inventario()
-    if codigo in inventario:
-        if codigonuevo in inventario:
-            if inventario[codigonuevo]["nombre"]!=nombre:
-                return False
-        del inventario[codigo]
-        inventario[codigonuevo] = {'nombre': nombre, 'precio': precio, 'cantidad': cantidad}
-        guardar_inventario(inventario)
+
+# Función para modificar un alumno
+def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
+    alumnos = cargar_alumnos()  # Cargar la lista de alumnos
+    alumno_encontrado = next((alumno for alumno in alumnos if alumno['dni'] == dni), None)
+
+    if alumno_encontrado:
+        # Verificar si el nuevo DNI ya existe en otro alumno
+        if any(alumno['dni'] == dni_nuevo and alumno['nombre'] != nombre for alumno in alumnos):
+            return False
+
+        # Actualizar los datos del alumno
+        alumno_encontrado['dni'] = dni_nuevo
+        alumno_encontrado['nombre'] = nombre
+        alumno_encontrado['apellido'] = apellido
+        alumno_encontrado['categoria'] = categoria
+        alumno_encontrado['cuota_estado'] = cuota_estado
+
+        # Guardar los cambios
+        guardar_alumno(alumnos)
         return True
+
     return False
 
 
-# Función para agregar un nuevo producto
-def agregar_producto(codigo_de_barras, nombre, precio, cantidad):
-    inventario = cargar_inventario()
-    if codigo_de_barras in inventario:
+# Función para agregar un nuevo alumno
+def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado):
+    alumnos = cargar_alumnos()  # Cargar la lista de alumnos
+
+    # Verificar si el DNI ya existe
+    if any(alumno['dni'] == dni for alumno in alumnos):
         return False
-    inventario[codigo_de_barras] = {'nombre': nombre, 'precio': precio, 'cantidad': cantidad}
-    guardar_inventario(inventario)
+
+    # Agregar el nuevo alumno
+    nuevo_alumno = {
+        'dni': dni,
+        'nombre': nombre,
+        'apellido': apellido,
+        'categoria': categoria,
+        'cuota_estado': cuota_estado
+    }
+    alumnos.append(nuevo_alumno)
+
+    # Guardar los cambios
+    guardar_alumno(alumnos)
     return True
 
 
 def eliminar(codigo):
-    inventario = cargar_inventario()
-    if codigo in inventario:
-        del inventario[codigo]
-        guardar_inventario(inventario)
+    alumno = cargar_alumnos()
+    if codigo in alumno:
+        del alumno[codigo]
+        guardar_alumno(alumno)
         return True
     else:
         return False
