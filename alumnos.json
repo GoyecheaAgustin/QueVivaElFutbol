@@ -1,1 +1,9 @@
-{}
+[
+    {
+        "dni": "41049800",
+        "nombre": "Agustin",
+        "apellido": "goyechea",
+        "categoria": "1998",
+        "cuota_estado": "moroso"
+    }
+]

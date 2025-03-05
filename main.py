@@ -323,7 +323,7 @@ class InventarioApp:
         
 
 
-    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota=""):
+    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado=""):
         if self.ventanaagregar is not False:
             return
 
@@ -372,7 +372,7 @@ class InventarioApp:
         tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
         self.cuota_entry = tk.Entry(main_frame, font=("Arial", 14))
         self.cuota_entry.grid(row=4, column=1, padx=10, pady=5)
-        self.cuota_entry.insert(tk.END, cuota)
+        self.cuota_entry.insert(tk.END, cuota_estado)
 
         botones_frame = tk.Frame(main_frame)
         botones_frame.grid(row=5, column=0, columnspan=2, pady=10)
@@ -619,7 +619,7 @@ class InventarioApp:
 
         # Si no hay modo restrictivo, vincular el evento de doble clic para editar un alumno
         if not self.restrict_mode.get():
-            self.tree.bind("<Double-1>", modificar_alumno)  # Vincular evento de doble clic para editar alumno
+            self.tree.bind("<Double-1>", self.editar_alumno)  # Vincular evento de doble clic para editar alumno
 
         # Empacar el árbol en la ventana
         self.tree.pack(pady=20)
@@ -904,22 +904,34 @@ class InventarioApp:
         self.ventanaagregar = False    
 
 
-    def editar_producto(self, event):
-        if self.editando_producto:
-            return  # Si ya se está editando otro producto, salir de la función
+    def editar_alumno(self, event):
+        if self.editando_alumno:
+            return  # Si ya se está editando otro alumno, salir de la función
+        
         item = self.tree.selection()
         if item:
-            # Obtener el código de barras del producto seleccionado
-            codigo_de_barras = self.tree.item(item, "values")[2]  # El índice 2 indica la columna del código de barras
-            producto = cargar_inventario().get(codigo_de_barras)
+            # Obtener el DNI del alumno seleccionado
+            dni_alumno = self.tree.item(item, "values")[0]  # Suponiendo que el DNI está en la primera columna
+            alumnos = cargar_alumnos()  # Esto devuelve una lista de alumnos
 
-            if producto:
-                # Mostrar ventana similar a agregar producto pero con datos del producto seleccionado
-                self.editando_producto = True
-                self.mostrar_ventana_agregar(editar=True, codigo=codigo_de_barras, nombre=producto['nombre'], cantidad=producto['cantidad'], precio=producto['precio'])
+            # Buscar el alumno en la lista
+            alumno = next((a for a in alumnos if a["dni"] == dni_alumno), None)
+
+            if alumno:
+                # Mostrar ventana similar a agregar alumno pero con datos del alumno seleccionado
+                self.editando_alumno = True
+                self.mostrar_ventana_agregar(
+                    editar=True, 
+                    dni=alumno["dni"], 
+                    nombre=alumno["nombre"], 
+                    apellido=alumno["apellido"], 
+                    categoria=alumno["categoria"], 
+                    cuota_estado=alumno["cuota_estado"]
+                )
                 self.toggleAgregar()
-            else:
-                messagebox.showerror("Error", "El producto seleccionado no existe en el inventario.")
+
+
+  
 
 
     def eliminar_producto(self, codigo):
@@ -936,40 +948,47 @@ class InventarioApp:
                 self.previous_window.focus_force()
 
 
-    def guardar_producto_editado(self, codigo):
+    def guardar_alumno_editado(self, dni):
         nombre = self.nombre_entry.get()
-        cantidad = self.cantidad_entry.get()
-        precio = self.precio_entry.get()
-        codigonuevo = self.codigo_entry.get()
-    
+        apellido = self.apellido_entry.get()
+        categoria = self.categoria_entry.get()
+        cuota_estado = self.cuota_entry.get()
+        dni_nuevo = self.dni_entry.get()  # Nuevo DNI en caso de edición
 
+        print(f"Valores ingresados en guardar_alumno_editado: dni={dni}, nombre={nombre}, apellido={apellido}, categoría={categoria}, cuota_estado={cuota_estado}")
 
-        print(f"Valores ingresados en guardar_producto_editado: nombre={nombre}, cantidad={cantidad}, precio={precio}, codigo={codigo}")
-
-        try:
-            cantidad = int(cantidad)
-            precio = float(precio)
-        except ValueError:
-            messagebox.showerror("Error", "Cantidad debe ser un entero y precio debe ser un número.")
+        # Validar que los campos no estén vacíos
+        if not nombre or not apellido or not categoria or not cuota_estado or not dni_nuevo:
+            messagebox.showerror("Error", "Todos los campos deben ser completados.")
             return
 
-        print(f"Valores convertidos en guardar_producto_editado: nombre={nombre}, cantidad={cantidad}, precio={precio}, codigo={codigo}")
+        # Validar que el DNI sea numérico
+        if not dni.isdigit() or not dni_nuevo.isdigit():
+            messagebox.showerror("Error", "El DNI debe contener solo números.")
+            return
 
-        if modificar_producto(codigo, nombre, precio, cantidad, codigonuevo):
-            messagebox.showinfo("Éxito", "Producto editado correctamente.")
+        # Validar que el nuevo DNI no esté en uso por otro alumno
+        alumnos = cargar_alumnos()  # Cargar la lista de alumnos
+        if dni_nuevo != dni and any(alumno['dni'] == dni_nuevo for alumno in alumnos):
+            messagebox.showerror("Error", "El nuevo DNI ya está registrado por otro alumno.")
+            return
+
+        # Llamar a la función para modificar el alumno
+        if modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
+            messagebox.showinfo("Éxito", "Alumno editado correctamente.")
             self.ventana_agregar.destroy()
             self.actualizar_vista_alumnos()
             self.toggleAgregar()
-            self.editando_producto = False
-            if self.ventanaAlumnos:
+            self.editando_alumno = False
+
+            # Asegurar que la ventana de alumnos no genere errores
+            if hasattr(self, 'ventana_alumnos') and self.ventana_alumnos:
                 self.ventana_alumnos.focus_force()
-            else:
+            elif hasattr(self, 'previous_window') and self.previous_window:
                 self.previous_window.focus_force()
         else:
-            messagebox.showerror("Error", "No se pudo editar el producto.")
-            self.ventanaagregar = False
-            self.editando_producto = False
-
+            messagebox.showerror("Error", "No se pudo editar el alumno.")
+            self.editando_alumno = False
 
     def buscar_alumno(self):
         # Limpiar árbol
@@ -992,7 +1011,7 @@ class InventarioApp:
             self.tree.delete(item)
 
         # Obtener los alumnos actualizados (deberías tener una función que los devuelva)
-        alumnos = self.cargar_alumnos()  # Esta función debe devolver los alumnos en formato adecuado
+        alumnos = cargar_alumnos()  # Esta función debe devolver los alumnos en formato adecuado
 
         # Mostrar los alumnos en el árbol
         for alumno in alumnos:

@@ -1,17 +1,29 @@
 import json
+import os
 
 # Archivo JSON para el alumno
 alumnos_FILE = 'alumnos.json'
 
-# Función para cargar el alumno desde el archivo JSON
 def cargar_alumnos():
-    try:
-        with open(alumnos_FILE, 'r') as file:
-            print(json.load(file))
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-
+    if not os.path.exists(alumnos_FILE):  # Si el archivo no existe, crea uno vacío
+        return []
+    
+    with open(alumnos_FILE, 'r') as file:
+        contenido = file.read().strip()  # Leer y eliminar espacios en blanco
+        if not contenido:  # Si está vacío, devuelve una lista vacía
+            return []
+        
+        try:
+            alumnos = json.loads(contenido)
+            if isinstance(alumnos, list):  # Asegurar que es una lista
+                return alumnos
+            else:
+                print("Error: El archivo JSON no contiene una lista, se reiniciará.")
+                return []
+        except json.JSONDecodeError:
+            print("Error: El archivo JSON está corrupto. Se reiniciará.")
+            return [] 
+        
 # Función para guardar el alumno en el archivo JSON
 def guardar_alumno(alumno):
     with open(alumnos_FILE, 'w') as file:
@@ -30,22 +42,23 @@ def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
     alumno_encontrado = next((alumno for alumno in alumnos if alumno['dni'] == dni), None)
 
     if alumno_encontrado:
-        # Verificar si el nuevo DNI ya existe en otro alumno
-        if any(alumno['dni'] == dni_nuevo and alumno['nombre'] != nombre for alumno in alumnos):
-            return False
-
         # Actualizar los datos del alumno
-        alumno_encontrado['dni'] = dni_nuevo
-        alumno_encontrado['nombre'] = nombre
-        alumno_encontrado['apellido'] = apellido
-        alumno_encontrado['categoria'] = categoria
-        alumno_encontrado['cuota_estado'] = cuota_estado
+        alumno_encontrado.update({
+            'dni': dni_nuevo,
+            'nombre': nombre,
+            'apellido': apellido,
+            'categoria': categoria,
+            'cuota_estado': cuota_estado
+        })
 
         # Guardar los cambios
         guardar_alumno(alumnos)
         return True
 
     return False
+
+    return False
+
 
 
 # Función para agregar un nuevo alumno
