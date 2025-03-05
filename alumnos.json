@@ -5,5 +5,19 @@
         "apellido": "goyechea",
         "categoria": "1998",
         "cuota_estado": "moroso"
+    },
+    {
+        "dni": "99",
+        "nombre": "dasds",
+        "apellido": "adsda",
+        "categoria": 1998,
+        "cuota_estado": "AL D\u00cdA"
+    },
+    {
+        "dni": "41049801",
+        "nombre": "sass",
+        "apellido": "assasas",
+        "categoria": 1998,
+        "cuota_estado": "AL D\u00cdA"
     }
 ]

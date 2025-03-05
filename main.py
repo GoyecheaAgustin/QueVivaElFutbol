@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from inventario import escanear_alumno, agregar_alumno, cargar_alumnos, modificar_alumno, eliminar, guardar_alumno
 from ventadiaria import guardar_venta_diaria
 import datetime
-import serial
+#import serial
 import os
 import sys
 import json
@@ -30,10 +30,11 @@ class InventarioApp:
         nombre_label.pack(side=tk.BOTTOM, pady=10)
 
         # Cargar imágenes usando rutas relativas
-        self.add_icon = tk.PhotoImage(file=self.resource_path("images/agregar.png"))
-        self.sell_icon = tk.PhotoImage(file=self.resource_path("images/venta.png"))
-        self.view_icon = tk.PhotoImage(file=self.resource_path("images/inventario.png"))
+        self.add_icon = tk.PhotoImage(file=self.resource_path("images/agregar_jugador.png"))
+        self.sell_icon = tk.PhotoImage(file=self.resource_path("images/cobro.png"))
+        self.view_icon = tk.PhotoImage(file=self.resource_path("images/lista.png"))
         self.caja_icon = tk.PhotoImage(file=self.resource_path("images/caja.png"))  # Asegúrate de tener esta imagen
+       
 
         self.buttons_frame = tk.Frame(master)
         self.buttons_frame.pack(pady=20)
@@ -368,11 +369,15 @@ class InventarioApp:
         self.categoria_entry.grid(row=3, column=1, padx=10, pady=5)
         self.categoria_entry.insert(tk.END, categoria)
 
-        # Campo Cuota
+        # Campo Cuota con Combobox
         tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
-        self.cuota_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.cuota_entry.grid(row=4, column=1, padx=10, pady=5)
-        self.cuota_entry.insert(tk.END, cuota_estado)
+
+        # Variable para almacenar la selección
+        self.cuota_estado = tk.StringVar(value="AL DÍA")  # Valor por defecto
+
+        # Combobox en lugar de OptionMenu
+        self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO"], state="readonly", font=("Arial", 14))
+        self.cuota_menu.grid(row=4, column=1, padx=10, pady=5)
 
         botones_frame = tk.Frame(main_frame)
         botones_frame.grid(row=5, column=0, columnspan=2, pady=10)
@@ -673,10 +678,10 @@ class InventarioApp:
         apellido = self.apellido_entry.get()
         dni = self.dni_entry.get()
         categoria = self.categoria_entry.get()
-        cuota = self.cuota_entry.get()
+        cuota_estado = self.cuota_estado.get()
 
         # Validaciones
-        if not nombre or not apellido or not dni or not categoria or not cuota:
+        if not nombre or not apellido or not dni or not categoria or not cuota_estado:
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
 
@@ -690,25 +695,18 @@ class InventarioApp:
             messagebox.showerror("Error", f"Categoría inválida: {str(e)}")
             return
 
-        # Validar la cuota
-        cuota_estado = cuota.lower().strip()
-        if cuota_estado not in ["al día", "moroso"]:
-            messagebox.showerror("Error", "La cuota debe ser 'al día' o 'moroso'.")
-            return
 
-        # Verificar si el alumno ya existe
-        if self.alumno_existente(dni):
+
+        if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado):
+
+            # Mostrar mensaje de éxito
+            messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
+            self.ventana_agregar.destroy()
+            self.toggleAgregar()
+        else: 
             messagebox.showerror("Error", "El alumno con este DNI ya está registrado.")
             return
 
-
-
-        agregar_alumno(dni,nombre,apellido,categoria,cuota_estado)
-
-        # Mostrar mensaje de éxito
-        messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
-        self.ventana_agregar.destroy()
-        self.toggleAgregar()
 
         # Actualizar la vista de alumnos si es necesario
         if self.ventanaAlumnos:
@@ -717,13 +715,6 @@ class InventarioApp:
         else:
             self.previous_window.focus_force()
 
-    def alumno_existente(self, dni):
-        # Verifica si el alumno ya está registrado por su DNI
-        # Aquí puedes buscar en tu lista de alumnos o base de datos
-        for alumno in self.lista_alumnos:
-            if alumno['dni'] == dni:
-                return True
-        return False
 
 
             
