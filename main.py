@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from inventario import escanear_alumno, agregar_alumno, cargar_alumnos, modificar_alumno, eliminar, guardar_alumno
 from ventadiaria import guardar_venta_diaria
-import datetime
+from datetime import datetime
 #import serial
 import os
 import sys
@@ -73,6 +73,7 @@ class InventarioApp:
         # Aplicar estado inicial del modo restricción
         #self.toggle_restriccion()
         self.cargar_estado_restriccion()  # Asegurarse de cargar el estado al inicio
+        self.actualizar_estado_cuota()
 
     def guardar_estado_restriccion(self):
         with open("estado_restriccion.json", "w") as file:
@@ -620,11 +621,14 @@ class InventarioApp:
         if fecha_pago:
             try:
                 dia_pago = int(fecha_pago.split("/")[0])  # Obtener solo el día
-                if dia_pago > 10:
-                    semanas_retraso = (dia_pago - 10) // 7
-                    monto_adicional = semanas_retraso * 1000  # Recargo de $1000 por semana de retraso
+                if dia_pago > 10 and dia_pago<17:
+                    monto_adicional = 1000  # Recargo de $1000 por semana de retraso
+                elif dia_pago > 16 and dia_pago<24:
+                    monto_adicional = 2000 
+                elif dia_pago > 23 and dia_pago<32:
+                    monto_adicional = 3000
                 else:
-                    monto_adicional = 0
+                    monto_adicional  = 0
             except ValueError:
                 monto_adicional = 0  # Si la fecha no es válida, no aplicar recargo
         else:
@@ -653,12 +657,13 @@ class InventarioApp:
         
 
         # Registrar el pago en el historial
-        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], self.monto_a_pagar, metodo_pago, fecha_pago)
+        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], fecha_pago,self.monto_a_pagar, metodo_pago)
 
         # Cerrar la ventana después de registrar el pago
         self.venta_finalizada = True
         self.ventanacobrar = False
         print(f"Pago de ${self.monto_a_pagar} registrado para {self.alumno_encontrado['nombre']} ({dni}).")
+        self.actualizar_estado_cuota()
         
 
 
@@ -1169,8 +1174,51 @@ class InventarioApp:
         for alumno in alumnos:
             self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
 
+    def actualizar_estado_cuota(self):
+        alumnos_path='alumnos.json'
+        historial_path='historial_pagos.json'
+        # Cargar los archivos JSON
+        with open(alumnos_path, 'r') as f:
+            alumnos = json.load(f)
 
+        # Verificar si el archivo historial_pagos.json existe
+        if os.path.exists(historial_path):
+            with open(historial_path, 'r') as f:
+                historial_pagos = json.load(f)
+        else:
+            historial_pagos = {}  # Si no existe, inicializamos un diccionario vacío
 
+        # Fecha actual
+        fecha_actual = datetime.now()
+
+        for alumno in alumnos:
+            dni = alumno["dni"]
+            # Inicializamos el estado de cuota como "AL DIA"
+            alumno["cuota_estado"] = "AL DIA"
+
+            # Verificar si el alumno tiene historial de pagos
+            if dni in historial_pagos:
+                pagos = historial_pagos[dni]["pagos"]
+                
+                # Si el alumno tiene pagos
+                if pagos:
+                    # Obtener la última fecha de pago
+                    ultima_fecha_pago = pagos[-1]["fecha"]
+                    ultima_fecha_pago = datetime.strptime(ultima_fecha_pago, "%d/%m/%Y")
+
+                    # Calcular la diferencia en días entre la fecha actual y la última fecha de pago
+                    dias_diferencia = (fecha_actual - ultima_fecha_pago).days
+
+                    # Si han pasado más de 29 días, actualizar el estado a "MOROSO"
+                    if dias_diferencia > 29:
+                        alumno["cuota_estado"] = "MOROSO"
+                else:
+                    # Si no hay pagos, mantener el estado como "AL DIA"
+                    alumno["cuota_estado"] = "AL DIA"
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")                 
+        # Guardar los cambios en el archivo alumnos.json
+        with open(alumnos_path, 'w') as f:
+            json.dump(alumnos, f, indent=4)
 
 
 
