@@ -83,12 +83,22 @@ def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado):
     guardar_alumno(alumnos)
     return True
 
+def eliminar(dni):
+    alumnos = cargar_alumnos()  # Cargar la lista de alumnos
 
-def eliminar(codigo):
-    alumno = cargar_alumnos()
-    if codigo in alumno:
-        del alumno[codigo]
-        guardar_alumno(alumno)
+    # Buscar el alumno con el DNI especificado
+    alumno_encontrado = None
+    for alumno in alumnos:
+        if alumno['dni'] == dni:
+            alumno_encontrado = alumno
+            break
+
+    if alumno_encontrado:
+        # Eliminar el alumno de la lista
+        alumnos.remove(alumno_encontrado)
+        guardar_alumno(alumnos)  # Guardar los cambios en el archivo
         return True
     else:
+        # Si no se encontró el alumno, retornar False
         return False
+

@@ -1,0 +1,14 @@
+{
+    "41049800": {
+        "dni": "41049800",
+        "nombre": "Agustin",
+        "categoria": "1998",
+        "pagos": [
+            {
+                "fecha": 20000,
+                "monto": "Efectivo",
+                "metodo_pago": "05/03/2025"
+            }
+        ]
+    }
+}

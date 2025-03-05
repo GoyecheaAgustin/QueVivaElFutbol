@@ -7,7 +7,7 @@ import datetime
 import os
 import sys
 import json
-from tkcalendar import DateEntry
+from tkcalendar import Calendar
 from tkinter import BooleanVar
 
 class InventarioApp:
@@ -19,12 +19,13 @@ class InventarioApp:
         self.editando_alumno = False
         self.lista_alumnos = []
         self.venta_finalizada = False
-        self.ventanavender = False
+        self.ventanacobrar = False
         self.ventanacaja = False
         self.total_con_descuento = 0 
         self.total_con_descuento = 0
         self.restrict_mode = BooleanVar()
         self.restrict_mode.set(self.cargar_estado_restriccion())
+        self.alumno_encontrado = None
 
         nombre_label = tk.Label(self.master, text="Desarrollado por Agustin Goyechea V1.1", font=("Arial", 6))
         nombre_label.pack(side=tk.BOTTOM, pady=10)
@@ -33,23 +34,23 @@ class InventarioApp:
         self.add_icon = tk.PhotoImage(file=self.resource_path("images/agregar_jugador.png"))
         self.sell_icon = tk.PhotoImage(file=self.resource_path("images/cobro.png"))
         self.view_icon = tk.PhotoImage(file=self.resource_path("images/lista.png"))
-        self.caja_icon = tk.PhotoImage(file=self.resource_path("images/caja.png"))  # Asegúrate de tener esta imagen
+        self.caja_icon = tk.PhotoImage(file=self.resource_path("images/balance.png"))  # Asegúrate de tener esta imagen
        
 
         self.buttons_frame = tk.Frame(master)
         self.buttons_frame.pack(pady=20)
-        self.caja_icon = self.caja_icon.subsample(10,10)
+        
 
         self.add_button = tk.Button(self.buttons_frame, text="Agregar Alumno", image=self.add_icon, compound=tk.LEFT, command=self.mostrar_ventana_agregar,  state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.add_button.pack(side=tk.LEFT, padx=10)
 
-        self.sell_button = tk.Button(self.buttons_frame, text="Cobrar", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cobrar)
+        self.sell_button = tk.Button(self.buttons_frame, text="Cobrar", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cuota)
         self.sell_button.pack(side=tk.LEFT, padx=10)
 
         self.view_button = tk.Button(self.buttons_frame, text="Lista Alumnos", image=self.view_icon, compound=tk.LEFT, command=self.mostrar_ventana_alumnos)
         self.view_button.pack(side=tk.LEFT, padx=10)
 
-        self.caja_button = tk.Button(self.buttons_frame, text="Cierre de Caja", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_caja)
+        self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_caja)
         self.caja_button.pack(side=tk.LEFT, padx=10)
         # Añadir el switch de restricción
         self.restrict_switch = tk.Checkbutton(self.master, text="Modo Restricción", variable=self.restrict_mode, command=self.toggle_restriccion)
@@ -92,8 +93,6 @@ class InventarioApp:
         else:
             self.solicitar_contraseña()
 
-
-
     def solicitar_contraseña(self):
         # Crear una ventana emergente para la contraseña
         self.ventana_contraseña = tk.Toplevel(self.master)
@@ -132,7 +131,6 @@ class InventarioApp:
         # Establecer la geometría de la ventana para que aparezca en el centro
         self.ventana_contraseña.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
-
     def verificar_contraseña(self):
         contraseña_correcta = "beto1986"  # Reemplaza esto con la contraseña correcta
         if self.entry_contraseña.get() == contraseña_correcta:
@@ -145,7 +143,6 @@ class InventarioApp:
             messagebox.showerror("Error", "Contraseña incorrecta.")
             self.entry_contraseña.delete(0, tk.END)
 
-    
 
     def mostrar_ventana_caja(self):
         if self.ventanacaja is not False:
@@ -323,7 +320,6 @@ class InventarioApp:
         caja_window.update_idletasks()
         
 
-
     def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado=""):
         if self.ventanaagregar is not False:
             return
@@ -404,147 +400,312 @@ class InventarioApp:
         return self.ventana_agregar
 
 
-
-
-
-    def mostrar_ventana_cobrar(self):
-        if self.ventanavender is not False:
+    def mostrar_ventana_cuota(self):
+        if self.ventanacobrar is not False:
             return
         self.venta_finalizada = False
-        self.carrito = {}  # Reiniciar el carrito aquí
+        self.carrito = {}
         self.lista_alumnos = []
         self.total = 0
-        self.ventanavender = True
+        self.ventanacobrar = True
         ventana_cobrar = tk.Toplevel(self.master)
-        ventana_cobrar.title("Vender")
-
+        ventana_cobrar.title("Cobrar Cuota")
+        
         def cerrar_ventana():
             self.venta_finalizada = False
-            self.ventanavender = False
+            self.ventanacobrar = False
             ventana_cobrar.destroy()
 
         ventana_cobrar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
 
-        # Frame para la entrada y el botón de cobrar
+        # Frame para la entrada y el botón de búsqueda
         input_frame = tk.Frame(ventana_cobrar)
         input_frame.pack(pady=5)
 
-        # Etiqueta y entrada para el código de barras
-        label = tk.Label(input_frame, text="Ingrese el código de barras:", font=("Arial", 14))
-        label.pack(side=tk.LEFT, padx=5)
-        self.entry_cobrar = tk.Entry(input_frame, font=("Arial", 14), width=30)
-        self.entry_cobrar.pack(side=tk.LEFT, padx=5)
+        # Etiqueta y entrada para el DNI
+        label_dni = tk.Label(input_frame, text="Ingrese el DNI del alumno:", font=("Arial", 14))
+        label_dni.pack(side=tk.LEFT, padx=5)
+        self.entry_dni = tk.Entry(input_frame, font=("Arial", 14), width=20)
+        self.entry_dni.pack(side=tk.LEFT, padx=5)
 
-        # Asignar la función cobrar_producto al evento Return (Enter)
-        self.entry_cobrar.bind("<Return>", lambda event: self.cobrar_producto())
-        self.entry_cobrar.focus_set()
+        # Botón para buscar el alumno
+        buscar_button = tk.Button(input_frame, text="Buscar Alumno", font=("Arial", 14), command=self.buscar_alumno_cuota)
+        buscar_button.pack(side=tk.LEFT, padx=5)
 
-        # Botón para añadir al carrito
-        cobrar_button = tk.Button(input_frame, text="Añadir al carrito", font=("Arial", 14), command=self.cobrar_producto)
-        cobrar_button.pack(side=tk.LEFT, padx=5)
+        # Etiqueta para mostrar nombre y apellido
+        self.label_nombre_apellido = tk.Label(ventana_cobrar, text="", font=("Arial", 14))
+        self.label_nombre_apellido.pack(pady=10, anchor="center")
 
-        # Botón para finalizar venta
-        self.finalizar_button = tk.Button(input_frame, text="Finalizar venta", font=("Arial", 14), command=self.finalizar_venta)
-        self.finalizar_button.pack(side=tk.LEFT, padx=5)
-        self.finalizar_button.config(state=tk.NORMAL)
+        # Frame para mostrar historial de pagos
+        self.historial_frame = tk.Frame(ventana_cobrar)
+        self.historial_frame.pack(pady=10)
+
+        # Etiqueta de historial de pagos
+        self.label_historial = tk.Label(self.historial_frame, text="Historial de Pagos:", font=("Arial", 14))
+        self.label_historial.pack()
+
+        # Crear Treeview para mostrar historial de pagos
+        self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Categoría', 'Fecha', 'Monto', 'Método de Pago'), show='headings')
+
+        # Configurar columnas
+        self.tree.column('DNI', anchor=tk.CENTER, width=100)
+        self.tree.column('Nombre', anchor=tk.W, width=150)
+        self.tree.column('Categoría', anchor=tk.CENTER, width=100)
+        self.tree.column('Fecha', anchor=tk.CENTER, width=100)
+        self.tree.column('Monto', anchor=tk.CENTER, width=100)
+        self.tree.column('Método de Pago', anchor=tk.W, width=120)
+
+        # Configurar encabezados
+        self.tree.heading('DNI', text='DNI', anchor=tk.CENTER)
+        self.tree.heading('Nombre', text='Nombre', anchor=tk.W)
+        self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER)
+        self.tree.heading('Fecha', text='Fecha', anchor=tk.CENTER)
+        self.tree.heading('Monto', text='Monto', anchor=tk.CENTER)
+        self.tree.heading('Método de Pago', text='Método de Pago', anchor=tk.W)
+
+        # Empacar el Treeview
+        self.tree.pack(pady=10, fill='both', expand=True)
 
 
-        # Frame para el área de texto y la barra de desplazamiento
-        text_frame = tk.Frame(ventana_cobrar)
-        text_frame.pack(pady=10, fill=tk.BOTH, expand=False)
+        # Insertar ejemplo de datos, reemplázalo con datos reales
 
-        # Usar grid para organizar el text_frame
-        text_frame.grid_rowconfigure(0, weight=1)
-        text_frame.grid_columnconfigure(0, weight=1)
 
-        # Área de texto para mostrar los productos y el total
-        self.output_text_cobrar = tk.Text(text_frame, height=11, width=60, font=("Arial", 14))
-        self.output_text_cobrar.grid(row=0, column=0, sticky="nsew")
+        self.tree.pack(pady=5)
 
-        # Añadir una barra de desplazamiento
-        scrollbar = tk.Scrollbar(text_frame, command=self.output_text_cobrar.yview)
-        scrollbar.grid(row=0, column=1, sticky="ns")
-        self.output_text_cobrar.config(yscrollcommand=scrollbar.set)
+        # Mostrar métodos de pago, monto, recargo y total a pagar
+        pago_frame = tk.Frame(ventana_cobrar)
+        pago_frame.pack(pady=10)
 
-        # Frame para los detalles del precio
-        detalles_precio_frame = tk.Frame(ventana_cobrar)
-        detalles_precio_frame.pack(side=tk.RIGHT, padx=20, pady=10, anchor="se")
+        # Métodos de pago
+        metodo_pago_label = tk.Label(pago_frame, text="Método de pago:", font=("Arial", 14))
+        metodo_pago_label.grid(row=0, column=0, padx=10)
+        self.var_pago = tk.StringVar()
+        self.var_pago.set("Efectivo")  # Valor por defecto
+        efectivo_radio = tk.Radiobutton(pago_frame, text="Efectivo", variable=self.var_pago, value="Efectivo", font=("Arial", 14))
+        transferencia_radio = tk.Radiobutton(pago_frame, text="Transferencia", variable=self.var_pago, value="Transferencia", font=("Arial", 14))
+        efectivo_radio.grid(row=0, column=1, padx=5)
+        transferencia_radio.grid(row=0, column=2, padx=5)
 
-        self.precio_parcial_label = tk.Label(detalles_precio_frame, text="Precio parcial: $0.0", font=("Arial", 14), foreground="blue")
-        self.precio_parcial_label.pack(anchor="e")
+        # Fecha de pago
+        fecha_pago_label = tk.Label(pago_frame, text="Fecha de pago (dd/mm):", font=("Arial", 14))
+        fecha_pago_label.grid(row=1, column=0, padx=10)
+        fecha_actual = tk.StringVar()
+        fecha_actual.set(self.obtener_fecha_actual())  # Fecha actual
+        self.entry_fecha_pago = tk.Entry(pago_frame, textvariable=fecha_actual, font=("Arial", 14), width=10)
+        self.entry_fecha_pago.grid(row=1, column=1, padx=5)
 
-        self.descuento_monto_label = tk.Label(detalles_precio_frame, text="Descuento: $0.0", font=("Arial", 14), foreground="green")
-        self.descuento_monto_label.pack(anchor="e")
+        self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
 
-        self.precio_final_label = tk.Label(detalles_precio_frame, text="Precio final: $0.0", font=("Arial", 14, "bold"), foreground="red")
-        self.precio_final_label.pack(anchor="e")
+        # Botón para seleccionar la fecha
+        calendario_button = tk.Button(pago_frame, text="Seleccionar Fecha", font=("Arial", 14), command=self.mostrar_calendario)
+        calendario_button.grid(row=1, column=2, padx=5)
 
-        self.vuelto_label = tk.Label(detalles_precio_frame, text="Vuelto: $0.0", font=("Arial", 14, "bold"), foreground="purple")
-        self.vuelto_label.pack(anchor="e")
+        # Monto y recargo
+        # Cuadro de pago
+        monto_label = tk.Label(pago_frame, text="Monto de Cuota: $", font=("Arial", 14))
+        monto_label.grid(row=2, column=0, padx=10)
 
+        # Mostrar la cuota fija (ejemplo: $20000)
+        self.cuota_base = 20000
+        self.label_monto = tk.Label(pago_frame, text=f"{self.cuota_base:.2f}", font=("Arial", 14))
+        self.label_monto.grid(row=2, column=1, padx=5)
+
+        # Etiqueta de recargo
+        recargo_label = tk.Label(pago_frame, text="Recargo: $", font=("Arial", 14))
+        recargo_label.grid(row=3, column=0, padx=10)
+        self.label_recargo = tk.Label(pago_frame, text="0.0", font=("Arial", 14))
+        self.label_recargo.grid(row=3, column=1, padx=5)
+
+        # Total a pagar
+        total_label = tk.Label(pago_frame, text="Total a Pagar: $", font=("Arial", 14))
+        total_label.grid(row=4, column=0, padx=10)
+        self.label_total = tk.Label(pago_frame, text=f"{self.cuota_base:.2f}", font=("Arial", 14))
+        self.label_total.grid(row=4, column=1, padx=5)
+
+        # Vincular la fecha para que actualice el total automáticamente
+        self.entry_fecha_pago.bind("<KeyRelease>", self.calcular_monto_pago)
+
+        # Botón para registrar pago
+        registrar_button = tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)
+        registrar_button.grid(row=5, column=0, columnspan=3, pady=10)
+
+
+    def mostrar_calendario(self):
+        calendario_popup = tk.Toplevel(self.master)
+        calendario_popup.title("Seleccionar Fecha")
+
+        # Calendario (puedes usar un widget de calendario aquí)
+        calendario = Calendar(calendario_popup, selectmode='day', date_pattern='dd/mm/yyyy')
+        calendario.pack(padx=10, pady=10)
+
+        # Función para actualizar la fecha en el entry
+        def seleccionar_fecha():
+            fecha_seleccionada = calendario.get_date()
+            self.entry_fecha_pago.delete(0, tk.END)
+            self.entry_fecha_pago.insert(0, fecha_seleccionada)  # Actualizar la entrada con la fecha seleccionada
+            self.calcular_monto_pago()
+            calendario_popup.destroy()
+
+        # Botón para seleccionar la fecha
+        seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
+        seleccionar_button.pack(pady=10)
         
 
-        screen_width = ventana_cobrar.winfo_screenwidth()
-        screen_height = ventana_cobrar.winfo_screenheight()
+    def buscar_alumno_cuota(self):
+        dni = self.entry_dni.get()
+        alumnos = cargar_alumnos()  # Cargar la lista de alumnos
+        print("entrada")
+        # Buscar el alumno por DNI
+        
+        for alumno in alumnos:
+            if alumno['dni'] == dni:
+                self.alumno_encontrado = alumno
+               
+                break
+            else: self.alumno_encontrado=None
+            self.mostrar_historial_pagos(dni)  # Mostrar historial de pagos
 
-        # Obtener el tamaño de la ventana
-        window_width = 950  # Establecer el ancho de la ventana
-        window_height = 550  # Establecer la altura de la ventana
+        if self.alumno_encontrado:
+            self.label_nombre_apellido.config(text=f"{self.alumno_encontrado['nombre']} {self.alumno_encontrado['apellido']}")
+            self.mostrar_historial_pagos(dni)  # Mostrar historial de pagos
+            self.calcular_monto_pago()
+        else:
+            self.label_nombre_apellido.config(text="Alumno no encontrado")
 
-        # Calcular las coordenadas para centrar la ventana
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
+    def mostrar_historial_pagos(self, dni):
+        archivo_historial = "historial_pagos.json"
 
-        # Establecer la geometría de la ventana para que aparezca en el centro
-        ventana_cobrar.geometry(f"{window_width}x{window_height}+{x}+{y+60}")
+        # Si el archivo no existe, salir de la función
+        if not os.path.exists(archivo_historial):
+            return
 
-        # Frame para el monto recibido y los botones "Calcular Vuelto" e "Imprimir Ticket"
-        monto_y_botones_frame = tk.Frame(ventana_cobrar)
-        monto_y_botones_frame.place(relx=0.5, rely=0.9, anchor="s")
- 
-        # Etiqueta y entrada para el descuento
-        descuento_label = tk.Label(monto_y_botones_frame, text="Descuento (%):", font=("Arial", 14))
-        descuento_label.grid(row=2, column=0, padx=5, pady=5)
-
-        monto_cliente_label = tk.Label(monto_y_botones_frame, text="Monto recibido del cliente:", font=("Arial", 14))
-        monto_cliente_label.grid(row=3, column=0, padx=5, pady=5)
-        self.monto_cliente_entry = tk.Entry(monto_y_botones_frame, font=("Arial", 14))
-        self.monto_cliente_entry.grid(row=3, column=1, padx=5, pady=5)
-
-        calcular_button = tk.Button(monto_y_botones_frame, text="Calcular Vuelto", font=("Arial", 14), command=self.calcular_vuelto)
-        calcular_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
-
-        self.imprimir_ticket_button = tk.Button(monto_y_botones_frame, text="Imprimir Ticket", font=("Arial", 14), command=self.imprimir_ticket, state=tk.DISABLED)
-        self.imprimir_ticket_button.grid(row=5, column=0, columnspan=2, padx=5, pady=5)
-        # Inicializar la entrada del descuento a 0
-        self.descuento_entry = tk.Entry(monto_y_botones_frame, font=("Arial", 14))
-        self.descuento_entry.grid(row=2, column=1, padx=5, pady=5)
-        self.descuento_entry.insert(0, "0")  # Inicializar con 0
-        descuento = float(self.descuento_entry.get()) if self.descuento_entry.get() else 0.0
-        self.monto_descuento = self.total * (descuento / 100)
-        self.total_con_descuento = self.total - self.monto_descuento
-        print(self.total)
-  
-        def calcular_total_con_descuento():
+        # Leer el historial general
+        with open(archivo_historial, "r") as file:
             try:
-                descuento = float(self.descuento_entry.get()) if self.descuento_entry.get() else 0.0
-                if descuento < 0 or descuento > 100:
-                    raise ValueError
+                historial_general = json.load(file)
+            except json.JSONDecodeError:
+                historial_general = {}
+
+        # Obtener la información del alumno por DNI
+        alumno = historial_general.get(dni, None)
+
+        # Si el alumno no existe en el historial, salir de la función
+        if not alumno:
+            return
+
+        # Obtener la lista de pagos
+        historial_pagos = alumno.get("pagos", [])
+
+        # Limpiar el contenido actual del Treeview
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Insertar los pagos en el Treeview
+        for pago in historial_pagos:
+            self.tree.insert('', 'end', values=(
+                alumno["dni"], 
+                alumno["nombre"], 
+                alumno["categoria"], 
+                pago["fecha"], 
+                pago["monto"], 
+                pago["metodo_pago"]  # Se agrega el método de pago
+            ))
+
+
+
+    def calcular_monto_pago(self, event=None):
+        """Calcula el recargo y actualiza el total cuando se ingresa la fecha de pago."""
+        fecha_pago = self.entry_fecha_pago.get()
+
+        if fecha_pago:
+            try:
+                dia_pago = int(fecha_pago.split("/")[0])  # Obtener solo el día
+                if dia_pago > 10:
+                    semanas_retraso = (dia_pago - 10) // 7
+                    monto_adicional = semanas_retraso * 1000  # Recargo de $1000 por semana de retraso
+                else:
+                    monto_adicional = 0
             except ValueError:
-                self.precio_final_label.config(text="Precio final: $0.0")
-                return
+                monto_adicional = 0  # Si la fecha no es válida, no aplicar recargo
+        else:
+            monto_adicional = 0
 
-            self.monto_descuento = self.total * (descuento / 100)
-            self.total_con_descuento = self.total - self.monto_descuento
+        # Calcular el monto total
+        monto_total = self.cuota_base + monto_adicional
 
-            self.precio_parcial_label.config(text=f"Precio parcial: ${self.total:.2f}")
-            self.descuento_monto_label.config(text=f"Descuento: - ${self.monto_descuento:.2f}")
-            self.precio_final_label.config(text=f"Precio final: ${self.total_con_descuento:.2f}")
+        # Actualizar los valores en la interfaz
+        self.label_recargo.config(text=f"{monto_adicional:.2f}")
+        self.label_total.config(text=f"{monto_total:.2f}")
 
-        self.descuento_entry.bind("<KeyRelease>", lambda event: calcular_total_con_descuento())
+        # Guardar el monto total en la variable de la clase
+        self.monto_a_pagar = monto_total
 
 
+    def registrar_pago(self):
+        dni = self.entry_dni.get()
+        metodo_pago = self.var_pago.get()
+        fecha_pago = self.entry_fecha_pago.get()
 
+        if not hasattr(self, 'monto_a_pagar'):
+            return  # No se puede registrar el pago si no se ha calculado el monto
+
+        # Obtener los detalles del alumno
+        
+
+        # Registrar el pago en el historial
+        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], self.monto_a_pagar, metodo_pago, fecha_pago)
+
+        # Cerrar la ventana después de registrar el pago
+        self.venta_finalizada = True
+        self.ventanacobrar = False
+        print(f"Pago de ${self.monto_a_pagar} registrado para {self.alumno_encontrado['nombre']} ({dni}).")
+        
+
+
+    def registrar_pago_en_historial(self, dni, nombre, categoria, fecha_pago, monto, metodo_pago):
+        archivo_historial = "historial_pagos.json"
+
+        # Cargar historial existente si el archivo ya existe
+        if os.path.exists(archivo_historial):
+            with open(archivo_historial, "r") as file:
+                try:
+                    historial_general = json.load(file)
+                except json.JSONDecodeError:
+                    historial_general = {}
+        else:
+            historial_general = {}
+
+        # Si el DNI no está en el historial, agregarlo con su información
+        if dni not in historial_general:
+            historial_general[dni] = {
+                "dni": dni,
+                "nombre": nombre,
+                "categoria": categoria,
+                "pagos": []
+            }
+
+        # Agregar el nuevo pago al historial del alumno
+        historial_general[dni]["pagos"].append({
+            "fecha": fecha_pago,
+            "monto": monto,
+            "metodo_pago": metodo_pago
+        })
+
+        # Guardar todo en un solo archivo JSON
+        with open(archivo_historial, "w") as file:
+            json.dump(historial_general, file, indent=4)
+
+        # Actualizar el Treeview si es necesario
+        self.mostrar_historial_pagos(dni)
+
+
+    def obtener_historial_pago(self, dni):
+        # Revisamos si existe el archivo de historial de pagos
+        archivo_historial = f"historial_pagos.json"
+        if os.path.exists(archivo_historial):
+            with open(archivo_historial, "r") as file:
+                return json.load(file)
+        return []
     def mostrar_ventana_alumnos(self):
         if self.ventanaAlumnos is not False:
             return
@@ -579,7 +740,7 @@ class InventarioApp:
         search_frame = tk.Frame(self.ventana_alumnos)
         search_frame.pack(pady=10)
 
-        label_buscar = tk.Label(search_frame, text="Buscar por nombre o por código de barras:", font=("Arial", 14))
+        label_buscar = tk.Label(search_frame, text="Buscar por nombre o DNI:", font=("Arial", 14))
         label_buscar.pack(pady=5)
 
         # Entrada de búsqueda
@@ -670,6 +831,9 @@ class InventarioApp:
             # Cerrar puerto serie
             puerto_serie.close()
 
+    def obtener_fecha_actual(self):
+        from datetime import datetime
+        return datetime.now().strftime('%d/%m/%Y')
 
 
     def agregar_alumno(self):
@@ -882,12 +1046,6 @@ class InventarioApp:
 
                 
 
-
-
-
-
-       
-
     def toggleAlumnos(self):
         self.ventanaAlumnos = False
 
@@ -922,28 +1080,26 @@ class InventarioApp:
                 self.toggleAgregar()
 
 
-  
-
-
-    def eliminar_producto(self, codigo):
-
-        if eliminar(codigo):
-            messagebox.showinfo("Éxito", "Producto eliminado correctamente.")
-            self.ventana_agregar.destroy()
-            self.actualizar_vista_alumnos()
-            self.editando_producto = False
-            self.toggleAgregar()
+    def eliminar_alumno(self, dni):
+        print("entra")
+        if eliminar(dni):  # Llamar a la función eliminar con el DNI
+            messagebox.showinfo("Éxito", "Alumno eliminado correctamente.")
+            self.ventana_agregar.destroy()  # Cierra la ventana de agregar si es necesario
+            self.actualizar_vista_alumnos()  # Actualiza la vista de los alumnos
+            self.editando_producto = False  # Marca que no está editando un producto
+            self.toggleAgregar()  # Alterna el estado de agregar
             if self.ventanaAlumnos:
-                self.ventana_alumnos.focus_force()
+                self.ventana_alumnos.focus_force()  # Trae al frente la ventana de alumnos
             else:
-                self.previous_window.focus_force()
+                self.previous_window.focus_force()  # Trae al frente la ventana anterior
+        self.editando_alumno=False
 
 
     def guardar_alumno_editado(self, dni):
         nombre = self.nombre_entry.get()
         apellido = self.apellido_entry.get()
         categoria = self.categoria_entry.get()
-        cuota_estado = self.cuota_entry.get()
+        cuota_estado = self.cuota_estado.get()
         dni_nuevo = self.dni_entry.get()  # Nuevo DNI en caso de edición
 
         print(f"Valores ingresados en guardar_alumno_editado: dni={dni}, nombre={nombre}, apellido={apellido}, categoría={categoria}, cuota_estado={cuota_estado}")
@@ -989,12 +1145,17 @@ class InventarioApp:
         # Obtener término de búsqueda
         termino_busqueda = self.entry_buscar.get()
 
-        # Buscar por nombre o código de barras
-        productos = cargar_inventario()
-        for codigo, datos in productos.items():
-            if termino_busqueda.lower() in datos['nombre'].lower() or termino_busqueda == codigo:
-                self.tree.insert('', tk.END, values=(datos['cantidad'], datos['nombre'], codigo, datos['precio']))
-        
+        # Buscar por nombre, apellido o DNI
+        alumnos = cargar_alumnos()  # Cargar la lista de alumnos
+
+        for alumno in alumnos:
+            # Compara el término de búsqueda con el nombre, apellido o DNI
+            if (termino_busqueda.lower() in alumno['nombre'].lower() or 
+                termino_busqueda.lower() in alumno['apellido'].lower() or 
+                termino_busqueda == alumno['dni']):
+                # Insertar los datos del alumno en el árbol
+                self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
+
 
     def actualizar_vista_alumnos(self):
         # Limpiar árbol
@@ -1007,6 +1168,10 @@ class InventarioApp:
         # Mostrar los alumnos en el árbol
         for alumno in alumnos:
             self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
+
+
+
+
 
 
 
