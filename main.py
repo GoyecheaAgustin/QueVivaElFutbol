@@ -402,7 +402,7 @@ class InventarioApp:
 
 
     def mostrar_ventana_cuota(self):
-        if self.ventanacobrar is not False:
+        if self.ventanacobrar is not False or self.ventanaAlumnos is True:
             return
         self.venta_finalizada = False
         self.carrito = {}
@@ -418,7 +418,24 @@ class InventarioApp:
             ventana_cobrar.destroy()
 
         ventana_cobrar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
+        
+        ancho_ventana = 700
+        alto_ventana = 650
+        ventana_cobrar.geometry(f"{ancho_ventana}x{alto_ventana}")
 
+        # Actualizar la ventana para que tome el tamaño definido
+        ventana_cobrar.update_idletasks()
+
+        # Obtener el tamaño de la pantalla
+        ancho_pantalla = ventana_cobrar.winfo_screenwidth()
+        alto_pantalla = ventana_cobrar.winfo_screenheight()
+
+        # Calcular la posición centrada
+        x_pos = (ancho_pantalla // 2) - (ancho_ventana // 2)
+        y_pos = (alto_pantalla // 2) - (alto_ventana // 2)
+
+        # Aplicar la posición y tamaño calculado
+        ventana_cobrar.geometry(f"{ancho_ventana}x{alto_ventana}+{x_pos}+{y_pos}")
         # Frame para la entrada y el botón de búsqueda
         input_frame = tk.Frame(ventana_cobrar)
         input_frame.pack(pady=5)
@@ -712,7 +729,7 @@ class InventarioApp:
                 return json.load(file)
         return []
     def mostrar_ventana_alumnos(self):
-        if self.ventanaAlumnos is not False:
+        if self.ventanaAlumnos is not False or self.ventanacobrar is not False:
             return
         self.previous_window = self.master.focus_get()  # Guardar la ventana activa actual
         self.ventanaAlumnos = True
@@ -1143,6 +1160,7 @@ class InventarioApp:
             self.editando_alumno = False
 
     def buscar_alumno(self):
+        
         # Limpiar árbol
         for item in self.tree.get_children():
             self.tree.delete(item)
