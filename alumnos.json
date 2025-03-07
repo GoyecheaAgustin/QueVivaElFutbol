@@ -46,5 +46,13 @@
         "categoria": 1999,
         "cuota_estado": "AL DIA",
         "email": "lelysluft16@gmail.com"
+    },
+    {
+        "dni": "555",
+        "nombre": "Pichi",
+        "apellido": "Belarmino",
+        "categoria": 1998,
+        "cuota_estado": "AL DIA",
+        "email": "alanbelarmino100@gmail.com"
     }
 ]

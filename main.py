@@ -12,6 +12,7 @@ from tkcalendar import Calendar
 from tkinter import BooleanVar
 from generador_comprobante import generar_recibo_profesional
 
+
 class InventarioApp:
     def __init__(self, master):
         self.master = master
@@ -22,7 +23,7 @@ class InventarioApp:
         self.lista_alumnos = []
         self.venta_finalizada = False
         self.ventanacobrar = False
-        self.ventanacaja = False
+        self.ventanabalance = False
         self.total_con_descuento = 0 
         self.total_con_descuento = 0
         self.restrict_mode = BooleanVar()
@@ -52,7 +53,7 @@ class InventarioApp:
         self.view_button = tk.Button(self.buttons_frame, text="Lista Alumnos", image=self.view_icon, compound=tk.LEFT, command=self.mostrar_ventana_alumnos)
         self.view_button.pack(side=tk.LEFT, padx=10)
 
-        self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_caja)
+        self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_balance)
         self.caja_button.pack(side=tk.LEFT, padx=10)
         # Añadir el switch de restricción
         self.restrict_switch = tk.Checkbutton(self.master, text="Modo Restricción", variable=self.restrict_mode, command=self.toggle_restriccion)
@@ -92,6 +93,8 @@ class InventarioApp:
         if self.restrict_mode.get():
             self.restrict_mode.set(True)
             self.add_button.config(state=tk.DISABLED)
+            self.caja_button.config(state=tk.DISABLED)
+            self.sell_button.config(state=tk.DISABLED)
             self.guardar_estado_restriccion()
         else:
             self.solicitar_contraseña()
@@ -139,6 +142,8 @@ class InventarioApp:
         if self.entry_contraseña.get() == contraseña_correcta:
             self.restrict_mode.set(False)
             self.add_button.config(state=tk.NORMAL)
+            self.caja_button.config(state=tk.NORMAL)
+            self.sell_button.config(state=tk.NORMAL)
             self.guardar_estado_restriccion()
             messagebox.showinfo("Modo Restricción", "Modo restricción desactivado.")
             self.ventana_contraseña.destroy()
@@ -147,180 +152,104 @@ class InventarioApp:
             self.entry_contraseña.delete(0, tk.END)
 
 
-    def mostrar_ventana_caja(self):
-        if self.ventanacaja is not False:
+    def mostrar_ventana_balance(self):
+        if self.ventanabalance:
             return
-        self.ventanacaja = True
-        def actualizar_ventas():
-            # Limpiar el Treeview
+        self.ventanabalance = True
+
+        def actualizar_balance():
             for item in tree.get_children():
                 tree.delete(item)
             
-            # Obtener la fecha seleccionada y formatearla a dd/mm/aaaa
-            fecha_seleccionada = date_entry.get()
-
-            # Filtrar las ventas del día seleccionado
-            if fecha_seleccionada in ventas_del_dia:
-                ventas_del_dia_seleccionada = ventas_del_dia[fecha_seleccionada]
-                mostrar_mensaje("")
-            else:
-                ventas_del_dia_seleccionada = []
-                mostrar_mensaje("No hay ventas para el día seleccionado")
-
-            # Inicializar total de ventas en el día
-            total_ventas_dia = 0
-
-            # Iterar sobre las ventas del día seleccionado y agregar los productos al Treeview
-            for venta in ventas_del_dia_seleccionada:
-                for producto, detalles in venta.items():
-                    cantidad_producto = detalles["cantidad"]
-                    precio_producto = detalles["precio"]
-                    total_producto = cantidad_producto * precio_producto
-                    tree.insert("", tk.END, text=producto, values=(cantidad_producto, f"${precio_producto:.2f}", f"${total_producto:.2f}"))
-                    total_ventas_dia += total_producto
-
-            # Actualizar el total vendido en el día
-            total_label.config(text=f"Total vendido en el día: ${total_ventas_dia:.2f}")
-
+            fecha_inicio = date_entry_inicio.get()
+            fecha_fin = date_entry_fin.get()
+            
+            try:
+                fecha_inicio_dt = datetime.strptime(fecha_inicio, "%d/%m/%Y")
+                fecha_fin_dt = datetime.strptime(fecha_fin, "%d/%m/%Y")
+            except ValueError:
+                mostrar_mensaje("Ingrese fechas válidas en formato dd/mm/aaaa")
+                return
+            
+            total_efectivo = 0
+            total_transferencia = 0
+            pagos_realizados = []
+            
+            for dni, datos in historial_pagos.items():
+                for pago in datos["pagos"]:
+                    fecha_pago_dt = datetime.strptime(pago["fecha"], "%d/%m/%Y")
+                    if fecha_inicio_dt <= fecha_pago_dt <= fecha_fin_dt:
+                        pagos_realizados.append((pago["fecha"], datos["nombre"], pago["monto"], pago["metodo_pago"]))
+                        if pago["metodo_pago"].lower() == "efectivo":
+                            total_efectivo += pago["monto"]
+                        else:
+                            total_transferencia += pago["monto"]
+            
+            for pago in pagos_realizados:
+                tree.insert("", tk.END, values=pago)
+            
+            total_label.config(text=f"Total en efectivo: ${total_efectivo:.2f} | Total en transferencia: ${total_transferencia:.2f} | Total abonado: ${total_efectivo + total_transferencia:.2f}")
+            mostrar_mensaje("")
+        
         def mostrar_mensaje(mensaje):
             mensaje_label.config(text=mensaje)
-
-        def imprimir_ventas():
-            # Obtener la fecha seleccionada y formatearla a dd/mm/aaaa
-            fecha_seleccionada = date_entry.get()
-            totalfinal = 0
-            # Obtener las ventas del día seleccionado
-            if fecha_seleccionada in ventas_del_dia:
-                ventas_del_dia_seleccionada = ventas_del_dia[fecha_seleccionada]
-            else:
-                ventas_del_dia_seleccionada = []
-
-            now = datetime.datetime.now()
-            fecha_hora = now.strftime("%Y-%m-%d %H:%M:%S")
-            total_line_length = 40
-            
-            ticket_text = ""
-            ticket_text += "=" * total_line_length + "\n"
-            ticket_text += " " * (int((total_line_length-21)/2)) + "S&S Tienda Multirubro" + " " * int(((total_line_length-21)/2)) + "\n"
-            ticket_text += " " * (int((total_line_length-28)/2)) + "Chaco 233 - Obera - Misiones" + " " * int(((total_line_length-28)/2)) + "\n"
-            ticket_text += "=" * total_line_length + "\n"
-            ticket_text += f"Fecha y Hora: {fecha_hora}\n"
-            ticket_text += "-" * total_line_length + "\n"        
-            
-            # Generar el texto del ticket
-            max_product_name_length = 20  # Ajusta este valor según tus necesidades
-
-            ticket_text += f"Ventas del dia {fecha_seleccionada}:\n\n"
-            ticket_text += f"{'Producto':<20}{'Cantidad':>10}{'Precio':>10}\n"
-            ticket_text += "-" * total_line_length + "\n"
-
-            for venta in ventas_del_dia_seleccionada:
-                for producto, detalles in venta.items():
-                    cantidad_producto = detalles["cantidad"]
-                    precio_producto = detalles["precio"]
-                    total_producto = cantidad_producto * precio_producto
-                    
-                    # Truncate product name if it exceeds max length
-                    if len(producto) > max_product_name_length:
-                        producto = producto[:max_product_name_length - 3] + "..."
-
-                    ticket_text += f"{producto:<20}{cantidad_producto:>7}{'$' + format(precio_producto, '.2f'):>13}\n"
-                    totalfinal += total_producto
-            
-            if totalfinal == 0:
-                ticket_text += "No se vendio ningun producto ese dia :(\n"   
-                ticket_text += "=" * total_line_length + "\n" + "\n" * 8  
-            else:
-                ticket_text += "-" * total_line_length + "\n"
-                ticket_text += f"MONTO TOTAL VENDIDO: ${totalfinal:.2f}\n"
-                ticket_text += "=" * total_line_length + "\n" + "\n" * 8
-
-            # Imprimir el ticket
-            print(ticket_text)
-            self.impresora(ticket_text)
-
-        # Crear la ventana de caja
-        caja_window = tk.Toplevel(self.master)
-        caja_window.title("Caja")
-
-
-
-        # Obtener el tamaño de la pantalla
-        screen_width = caja_window.winfo_screenwidth()
-        screen_height = caja_window.winfo_screenheight()
-
-        # Obtener el tamaño de la ventana
-        window_width = 900  # Ajusta el ancho de la ventana
-        window_height = 550 # Ajusta la altura de la ventana
-
-        # Calcular las coordenadas para centrar la ventana
+        
+        balance_window = tk.Toplevel(self.master)
+        balance_window.title("Balance de Pagos")
+        
+        screen_width = balance_window.winfo_screenwidth()
+        screen_height = balance_window.winfo_screenheight()
+        window_width = 900
+        window_height = 550
         x = (screen_width // 2) - (window_width // 2)
         y = (screen_height // 2) - (window_height // 2)
-
-        # Establecer la geometría de la ventana para que aparezca en el centro
-        caja_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
-
+        balance_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
+        
         def cerrar_ventana():
-            self.ventanacaja = False
-            caja_window.destroy()
+            self.ventanabalance = False
+            balance_window.destroy()
         
-        caja_window.protocol("WM_DELETE_WINDOW", cerrar_ventana)
-
-        # Cargar el archivo JSON que contiene las ventas
+        balance_window.protocol("WM_DELETE_WINDOW", cerrar_ventana)
+        
         try:
-            # Intentar cargar el archivo JSON que contiene las ventas
-            with open("ventas_diarias.json", "r") as file:
-                ventas_del_dia = json.load(file)
+            with open("historial_pagos.json", "r") as file:
+                historial_pagos = json.load(file)
         except FileNotFoundError:
-            # Si el archivo no se encuentra, crear un diccionario vacío
-            ventas_del_dia = {}
-
-        fecha = datetime.datetime.now().strftime("%d/%m/%Y")
-        # Mostrar el selector de fecha
-        date_entry_label = tk.Label(caja_window, text="Ingrese la fecha (dd/mm/aaaa):", font=("Arial", 12, "bold"))
-        date_entry_label.pack(pady=10)
-
-        date_entry = tk.Entry(caja_window, font=("Arial", 14))
-        date_entry.insert(0, fecha)  # Insertar la fecha actual en el widget
-        date_entry.pack(pady=10)
+            historial_pagos = {}
         
+        tk.Label(balance_window, text="Fecha inicio (dd/mm/aaaa):", font=("Arial", 12, "bold")).grid(row=0, column=0, pady=5, padx=10)
+        date_entry_inicio = tk.Entry(balance_window, font=("Arial", 14))
+        date_entry_inicio.grid(row=0, column=1, pady=5, padx=5)
+        
+        # Botón para seleccionar la fecha de inicio
+        calendario_button_inicio = tk.Button(balance_window, text="Seleccionar Fecha", font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_inicio))
+        calendario_button_inicio.grid(row=0, column=2, padx=5)
+        
+        tk.Label(balance_window, text="Fecha fin (dd/mm/aaaa):", font=("Arial", 12, "bold")).grid(row=1, column=0, pady=5, padx=10)
+        date_entry_fin = tk.Entry(balance_window, font=("Arial", 14))
+        date_entry_fin.grid(row=1, column=1, pady=5, padx=5)
+        
+        # Botón para seleccionar la fecha de fin
+        calendario_button_fin = tk.Button(balance_window, text="Seleccionar Fecha", font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_fin))
+        calendario_button_fin.grid(row=1, column=2, padx=5)
+        tk.Button(balance_window, text="Mostrar Balance", command=actualizar_balance).grid(row=2, column=0, columnspan=3, pady=10)
+        
+        tree = ttk.Treeview(balance_window, columns=("Fecha", "Nombre", "Monto", "Método de Pago"), show="headings")
+        tree.heading("Fecha", text="Fecha")
+        tree.heading("Nombre", text="Nombre")
+        tree.heading("Monto", text="Monto")
+        tree.heading("Método de Pago", text="Método de Pago")
+        tree.grid(row=3, column=0, columnspan=3, padx=20, pady=10, sticky="nsew")
+        
+        total_label = tk.Label(balance_window, text="Total en efectivo: $0.00 | Total en transferencia: $0.00 | Total abonado: $0.00", font=("Arial", 12, "bold"))
+        total_label.grid(row=4, column=0, columnspan=3, pady=10)
+        
+        mensaje_label = tk.Label(balance_window, text="", font=("Arial", 12))
+        mensaje_label.grid(row=5, column=0, columnspan=3, pady=10)
+        
+        balance_window.update_idletasks()
 
-        def validar_fecha():
-            fecha = date_entry.get()
-            try:
-                datetime.datetime.strptime(fecha, "%d/%m/%Y")
-                # Si la fecha es válida, llamar a la función para actualizar las ventas
-                actualizar_ventas()
-            except ValueError:
-                # Si hay un error, mostrar un mensaje de error al usuario
-                mostrar_mensaje("Por favor, ingrese una fecha válida en formato dd/mm/aaaa")
 
-        # Botón para actualizar las ventas según la fecha ingresada
-        actualizar_button = tk.Button(caja_window, text="Mostrar Ventas", command=validar_fecha)
-        actualizar_button.pack(pady=10)
-
-        # Botón para imprimir las ventas del día en formato de ticket
-        imprimir_button = tk.Button(caja_window, text="Imprimir Ticket", command=imprimir_ventas)
-        imprimir_button.pack(pady=10)
-
-        # Crear el Treeview para mostrar los productos vendidos en columnas
-        tree = ttk.Treeview(caja_window)
-        tree["columns"] = ("Cantidad", "Precio", "Total")
-        tree.heading("#0", text="Producto", anchor=tk.W)
-        tree.heading("Cantidad", text="Cantidad", anchor=tk.W)
-        tree.heading("Precio", text="Precio", anchor=tk.W)
-        tree.heading("Total", text="Total", anchor=tk.W)
-        tree.pack(padx=20, pady=10)
-
-        # Mostrar el total vendido en el día en negrita
-        total_label = tk.Label(caja_window, text="Total vendido en el día: $0.00", font=("Arial", 12, "bold"))
-        total_label.pack(pady=10)
-
-        # Etiqueta para mostrar mensajes
-        mensaje_label = tk.Label(caja_window, text="", font=("Arial", 12))
-        mensaje_label.pack(pady=10)
-
-        caja_window.update_idletasks()
         
 
     def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado="",email=""):
@@ -520,10 +449,11 @@ class InventarioApp:
         self.entry_fecha_pago.grid(row=1, column=1, padx=5)
 
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
-
         # Botón para seleccionar la fecha
-        calendario_button = tk.Button(pago_frame, text="Seleccionar Fecha", font=("Arial", 14), command=self.mostrar_calendario)
+        calendario_button = tk.Button(pago_frame, text="Seleccionar Fecha", font=("Arial", 14), 
+                                    command=lambda: self.mostrar_calendario(self.entry_fecha_pago))
         calendario_button.grid(row=1, column=2, padx=5)
+
 
         # Monto y recargo
         # Cuadro de pago
@@ -555,26 +485,38 @@ class InventarioApp:
         registrar_button.grid(row=5, column=0, columnspan=3, pady=10)
 
 
-    def mostrar_calendario(self):
+    def mostrar_calendario(self, entry_widget):
+        # Crear la ventana emergente
         calendario_popup = tk.Toplevel(self.master)
         calendario_popup.title("Seleccionar Fecha")
 
-        # Calendario (puedes usar un widget de calendario aquí)
+        # Calcular la posición para centrar la ventana en la pantalla
+        screen_width = calendario_popup.winfo_screenwidth()
+        screen_height = calendario_popup.winfo_screenheight()
+        window_width = 300  # Ajusta el ancho para que la ventana sea más pequeña
+        window_height = 250  # Ajusta la altura para que la ventana sea más pequeña
+
+        # Calcular la posición X y Y para centrar la ventana
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+        calendario_popup.geometry(f"{window_width}x{window_height}+{x}+{y}")  # Configurar la geometría
+
+        # Calendario
         calendario = Calendar(calendario_popup, selectmode='day', date_pattern='dd/mm/yyyy')
         calendario.pack(padx=10, pady=10)
 
         # Función para actualizar la fecha en el entry
         def seleccionar_fecha():
             fecha_seleccionada = calendario.get_date()
-            self.entry_fecha_pago.delete(0, tk.END)
-            self.entry_fecha_pago.insert(0, fecha_seleccionada)  # Actualizar la entrada con la fecha seleccionada
-            self.calcular_monto_pago()
-            calendario_popup.destroy()
+            entry_widget.delete(0, tk.END)  # Limpiar el campo de entrada
+            entry_widget.insert(0, fecha_seleccionada)  # Insertar la fecha seleccionada
+            calendario_popup.destroy()  # Cerrar el calendario
 
         # Botón para seleccionar la fecha
         seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
         seleccionar_button.pack(pady=10)
-        
+
+            
 
     def buscar_alumno_cuota(self):
         dni = self.entry_dni.get()
@@ -920,52 +862,6 @@ class InventarioApp:
 
 
 
-            
-    def imprimir_ticket(self):
-        now = datetime.datetime.now()
-        fecha_hora = now.strftime("%Y-%m-%d %H:%M:%S")
-        total_line_length = 40
-        
-        ticket_text = ""
-        ticket_text += "=" * total_line_length + "\n"
-        ticket_text += " " * (int((total_line_length-21)/2)) + "S&S Tienda Multirubro" + " " * int(((total_line_length-21)/2)) + "\n"
-        ticket_text += " " * (int((total_line_length-28)/2)) + "Chaco 233 - Obera - Misiones" + " " * int(((total_line_length-28)/2)) + "\n"
-        ticket_text += "=" * total_line_length + "\n"
-        ticket_text += f"Fecha y Hora: {fecha_hora}\n"
-        ticket_text += "-" * total_line_length + "\n"
-        ticket_text += f"{'Producto':<20}{'Precio':>10}{'Cantidad':>10}\n"
-        ticket_text += "-" * total_line_length + "\n"
-
-        contador = {}
-
-        # Contar las ocurrencias de cada producto
-        for item in self.lista_alumnos:
-            nombre = item['nombre']
-            if nombre in contador:
-                contador[nombre]['cantidad'] += 1
-            else:
-                contador[nombre] = item.copy()  # Crear una copia del diccionario para evitar modificar el original
-                contador[nombre]['cantidad'] = 1
-
-        # Crear la nueva lista de diccionarios con la cantidad actualizada
-        nueva_lista_diccionarios = list(contador.values())
-
-        for producto in nueva_lista_diccionarios:
-            nombre = producto['nombre'][:20]  # Limitar el nombre a 20 caracteres
-            precio = f"${producto['precio']:.2f}"
-            cantidad = producto['cantidad']
-            ticket_text += f"{nombre:<20}{precio:>10}{cantidad:>10}\n"
-
-        ticket_text += "-" * total_line_length + "\n"
-        ticket_text += f"{'Precio parcial:':<30}{f'${self.total:.2f}':>10}\n"
-        ticket_text += f"{'Descuento:':<30}{f'-${self.monto_descuento:.2f}':>10}\n"
-        ticket_text += f"{'Precio final:':<30}{f'${self.total_con_descuento:.2f}':>10}\n"
-        ticket_text += "=" * total_line_length + "\n"
-        ticket_text += " "*(int((total_line_length-19)/2))+ "Gracias por su compra!"+" "*(int((total_line_length-19)/2))+"\n"
-        ticket_text += "=" * total_line_length + "\n"+ " "*(int((total_line_length-15)/2)) +"Tel: 3755-822157"+ " "*(int((total_line_length-15)/2)) +"\n"+ "\n"+ "\n"+ "\n"+ "\n"+ "\n"+ "\n"+ "\n"
-        
-        print(ticket_text)
-        self.impresora(ticket_text)
 
 
 
@@ -988,54 +884,6 @@ class InventarioApp:
         """Desplaza automáticamente el texto hacia abajo."""
         self.output_text_cobrar.yview(tk.END)
 
-
-    def finalizar_venta(self):
-        self.venta_finalizada = True
-        self.imprimir_ticket_button.config(state=tk.NORMAL)
-        self.output_text_cobrar.delete(1.0, tk.END)  # Limpiar el área de texto
-        self.output_text_cobrar.insert(tk.END, "Productos vendidos:\n")
-        self.finalizar_button.config(state=tk.DISABLED)
-
-        # Para evitar duplicados y mostrar cantidades correctamente
-        productos_unicos = {}
-        for producto in self.lista_alumnos:
-            nombre = producto['nombre']
-            if nombre in productos_unicos:
-                productos_unicos[nombre]['cantidad'] += 1
-            else:
-                productos_unicos[nombre] = {
-                    'nombre': producto['nombre'],
-                    'precio': producto['precio'],
-                    'cantidad': 1
-                }
-
-        for nombre, datos in productos_unicos.items():
-            self.output_text_cobrar.insert(tk.END, f"{datos['nombre']} - ${datos['precio']:.2f} x {datos['cantidad']}\n")
-
-        self.output_text_cobrar.insert(tk.END, f"\nTotal: ${self.total:.2f}")
-        self.output_text_cobrar.insert(tk.END, "\nVenta finalizada. \nNo se pueden añadir más productos.\n")
-        
-        # Guardar la venta diaria
-
-        guardar_venta_diaria(productos_unicos)
-        # Actualizar el inventario real
-        inventario = cargar_inventario()
-        if len(self.carrito) != 0:
-            for codigo, datos in self.carrito.items():
-                inventario[codigo]['cantidad'] -= datos['cantidad']
-        guardar_inventario(inventario)
-
-        if self.imprimir_ticket_button is None:
-            # Crear el botón de imprimir ticket
-            self.imprimir_ticket_button = tk.Button(self.output_text_cobrar.master, text="Imprimir Ticket", command=self.imprimir_ticket)
-
-            # Calcular las coordenadas relativas para centrar el botón horizontalmente
-            button_width = 150  # Ancho del botón
-            x = (self.output_text_cobrar.master.winfo_width() - button_width) // 2
-            y = self.output_text_cobrar.master.winfo_height() - 50  # Colocar el botón cerca del borde inferior
-
-            # Posicionar el botón utilizando el método place()
-            self.imprimir_ticket_button.place(relx=x / self.output_text_cobrar.master.winfo_width(), rely=y / self.output_text_cobrar.master.winfo_height())
 
                 
 

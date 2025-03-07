@@ -148,5 +148,18 @@
                 "email": "lelysluft16@gmail.com"
             }
         ]
+    },
+    "555": {
+        "dni": "555",
+        "nombre": "Pichi",
+        "categoria": 1998,
+        "pagos": [
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "alanbelarmino100@gmail.com"
+            }
+        ]
     }
 }
