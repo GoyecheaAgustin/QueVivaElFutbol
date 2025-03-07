@@ -75,6 +75,12 @@
                 "monto": 20000,
                 "metodo_pago": "Efectivo",
                 "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
             }
         ]
     },
@@ -114,6 +120,32 @@
                 "monto": 20000,
                 "metodo_pago": "Transferencia",
                 "email": "fabiandroid7@gmail.com "
+            }
+        ]
+    },
+    "123": {
+        "dni": "123",
+        "nombre": "Juan",
+        "categoria": 1999,
+        "pagos": [
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Transferencia",
+                "email": "juanq99@live.com"
+            }
+        ]
+    },
+    "789": {
+        "dni": "789",
+        "nombre": "Lelys",
+        "categoria": 1999,
+        "pagos": [
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "lelysluft16@gmail.com"
             }
         ]
     }

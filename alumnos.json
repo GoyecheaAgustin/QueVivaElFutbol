@@ -30,5 +30,21 @@
         "categoria": 1999,
         "cuota_estado": "AL DIA",
         "email": "fabiandroid7@gmail.com "
+    },
+    {
+        "dni": "123",
+        "nombre": "Juan",
+        "apellido": "Quel",
+        "categoria": 1999,
+        "cuota_estado": "AL DIA",
+        "email": "juanq99@live.com"
+    },
+    {
+        "dni": "789",
+        "nombre": "Lelys",
+        "apellido": "Luft",
+        "categoria": 1999,
+        "cuota_estado": "AL DIA",
+        "email": "lelysluft16@gmail.com"
     }
 ]
