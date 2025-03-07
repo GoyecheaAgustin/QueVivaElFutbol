@@ -10,6 +10,7 @@ import sys
 import json
 from tkcalendar import Calendar
 from tkinter import BooleanVar
+from generador_comprobante import generar_recibo_profesional
 
 class InventarioApp:
     def __init__(self, master):
@@ -680,6 +681,7 @@ class InventarioApp:
         # Obtener los detalles del alumno
         nombre = self.alumno_encontrado['nombre']
         
+        completo=nombre+" "+self.alumno_encontrado['apellido']
         email_to = self.alumno_encontrado['email'] # Asegurar que el alumno tenga email
         print(email_to)
 
@@ -687,7 +689,9 @@ class InventarioApp:
         self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], fecha_pago,self.monto_a_pagar, metodo_pago, email_to)
             # Enviar el comprobante si el alumno tiene correo registrado
         if email_to:
-            enviar_comprobante(email_to, nombre, self.monto_a_pagar, fecha_pago, metodo_pago)
+            file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago)
+            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file)
+
         else:
             print(f"⚠ No se pudo enviar comprobante: {nombre} no tiene correo registrado.")
         # Cerrar la ventana después de registrar el pago

@@ -6,5 +6,13 @@
         "categoria": "1998",
         "cuota_estado": "AL DIA",
         "email": "goyecheaagustin@gmail.com"
+    },
+    {
+        "dni": "123456789",
+        "nombre": "Beto",
+        "apellido": "Goyechea",
+        "categoria": 1986,
+        "cuota_estado": "AL DIA",
+        "email": "betogoyechea@gmail.com"
     }
 ]

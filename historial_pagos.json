@@ -21,6 +21,73 @@
                 "monto": 20000,
                 "metodo_pago": "Transferencia",
                 "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "21/03/2025",
+                "monto": 22000,
+                "metodo_pago": "Transferencia",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            }
+        ]
+    },
+    "123456789": {
+        "dni": "123456789",
+        "nombre": "Beto",
+        "categoria": 1986,
+        "pagos": [
+            {
+                "fecha": "27/03/2025",
+                "monto": 23000,
+                "metodo_pago": "Transferencia",
+                "email": "betogoyechea@gmail.com"
             }
         ]
     }

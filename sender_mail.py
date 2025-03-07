@@ -1,47 +1,65 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import json
-import os
+from email.mime.application import MIMEApplication  # Necesario para adjuntar el PDF
+from datetime import datetime
 
-def enviar_comprobante(email_to, alumno, monto, fecha, metodo_pago):
+def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
+    # Configuración del servidor SMTP
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     email_user = "quevivaelfutbolescuela@gmail.com"
     email_password = "nifk zxuu extq xejb"
-    email_to = email_to
-        # Crear el mensaje
+
+    # Crear el mensaje
     msg = MIMEMultipart()
     msg["From"] = email_user
     msg["To"] = email_to
     msg["Subject"] = f"Comprobante de Pago - {alumno}"
 
+    # Obtener la fecha y hora actual
+    fecha_hora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
     # Cuerpo del mensaje
     body = f"""
-    Estimado/a {alumno},
+    Estimado/a {alumno},  
 
-    Le informamos que hemos registrado su pago con los siguientes detalles:
+    Esperamos que este mensaje le encuentre bien.  
 
-    📌 **Comprobante de Pago**
-    --------------------------------
-    💰 Monto: {monto}
-    📅 Fecha: {fecha}
-    💳 Método de Pago: {metodo_pago}
-    ✅ Estado: Pagado
+    Le confirmamos que hemos registrado correctamente su pago con los siguientes detalles:  
 
-    Gracias por su confianza.
+    📌 Detalles del Pago
+    --------------------------------  
+    💰 Monto: {monto}  
+    📅 Fecha y Hora: {fecha_hora}  
+    💳 Método de Pago: {metodo_pago}  
+    ✅ Estado: Pagado  
 
-    ¡Que viva el fútbol!
-    """
+    Agradecemos su puntualidad y confianza en nuestra institución. Si tiene alguna consulta, no dude en comunicarse con nosotros.  
+
+    Atentamente,  
+
+    ⚽ ¡Que viva el fútbol!  
+    """  
+
+    # Adjuntar el cuerpo del mensaje
     msg.attach(MIMEText(body, "plain"))
+
+    # Adjuntar el comprobante PDF
+    with open(pdf_path, "rb") as archivo_pdf:
+        adjunto = MIMEApplication(archivo_pdf.read(), _subtype="pdf")
+        adjunto.add_header('Content-Disposition', 'attachment', filename="comprobante_pago.pdf")
+        msg.attach(adjunto)
 
     # Enviar el correo
     try:
+        # Establecer la conexión con el servidor SMTP
         server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()
+        server.starttls()  # Establecer la conexión segura
         server.login(email_user, email_password)
         server.sendmail(email_user, email_to, msg.as_string())
-        server.quit()
+        server.quit()  # Cerrar la conexión
         print(f"✅ Comprobante enviado a {email_to}")
     except Exception as e:
         print(f"❌ Error al enviar el correo: {e}")
+
