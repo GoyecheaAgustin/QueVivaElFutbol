@@ -14,5 +14,21 @@
         "categoria": 1986,
         "cuota_estado": "AL DIA",
         "email": "betogoyechea@gmail.com"
+    },
+    {
+        "dni": "123456788",
+        "nombre": "Melina",
+        "apellido": "Goyechea",
+        "categoria": 2004,
+        "cuota_estado": "AL DIA",
+        "email": "melinagoyechea@gmail.com"
+    },
+    {
+        "dni": "456",
+        "nombre": "Fabi",
+        "apellido": "Alvarez",
+        "categoria": 1999,
+        "cuota_estado": "AL DIA",
+        "email": "fabiandroid7@gmail.com "
     }
 ]

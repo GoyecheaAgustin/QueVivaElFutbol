@@ -53,7 +53,7 @@ def generar_recibo_profesional(alumno, monto, metodo_pago):
     # Detalles de la transacción
     c.setFont("Helvetica", 10)
     c.drawString(50, 480, f"Alumno: {alumno}")
-    c.drawString(50, 460, f"Monto: {monto}")
+    c.drawString(50, 460, f"Monto: {monto} Pesos")
     c.drawString(50, 440, f"Fecha y Hora de Pago: {fecha_hora1}")
     c.drawString(50, 420, f"Método de Pago: {metodo_pago}")
 
@@ -73,8 +73,8 @@ def generar_recibo_profesional(alumno, monto, metodo_pago):
     c.setFont("Helvetica", 8)
     c.setFillColor(colors.grey)
     c.drawString(50, 330, "Para más información, contáctenos en:")
-    c.drawString(50, 310, "Correo: quevivaelfutbol@gmail.com")
-    c.drawString(50, 290, "Teléfono: 3764 18-7861 [Profe Beto]")
+    c.drawString(50, 310, "Correo: quevivaelfutbolescuela@gmail.com")
+    c.drawString(50, 290, "Teléfono: 3764 187861 [Profe Beto]")
 
     # Guardar el PDF
     c.save()

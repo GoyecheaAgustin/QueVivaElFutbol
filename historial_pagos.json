@@ -90,5 +90,31 @@
                 "email": "betogoyechea@gmail.com"
             }
         ]
+    },
+    "123456788": {
+        "dni": "123456788",
+        "nombre": "Melina",
+        "categoria": 2004,
+        "pagos": [
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Efectivo",
+                "email": "melinagoyechea@gmail.com"
+            }
+        ]
+    },
+    "456": {
+        "dni": "456",
+        "nombre": "Fabi",
+        "categoria": 1999,
+        "pagos": [
+            {
+                "fecha": "07/03/2025",
+                "monto": 20000,
+                "metodo_pago": "Transferencia",
+                "email": "fabiandroid7@gmail.com "
+            }
+        ]
     }
 }

@@ -30,7 +30,7 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
 
     📌 Detalles del Pago
     --------------------------------  
-    💰 Monto: {monto}  
+    💰 Monto: {monto} Pesos  
     📅 Fecha y Hora: {fecha_hora}  
     💳 Método de Pago: {metodo_pago}  
     ✅ Estado: Pagado  
