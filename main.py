@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from inventario import escanear_alumno, agregar_alumno, cargar_alumnos, modificar_alumno, eliminar, guardar_alumno
 from ventadiaria import guardar_venta_diaria
 from datetime import datetime
+from sender_mail import enviar_comprobante
 #import serial
 import os
 import sys
@@ -321,7 +322,7 @@ class InventarioApp:
         caja_window.update_idletasks()
         
 
-    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado=""):
+    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado="",email=""):
         if self.ventanaagregar is not False:
             return
 
@@ -366,18 +367,23 @@ class InventarioApp:
         self.categoria_entry.grid(row=3, column=1, padx=10, pady=5)
         self.categoria_entry.insert(tk.END, categoria)
 
+        tk.Label(main_frame, text="Email:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
+        self.email_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.email_entry.grid(row=4, column=1, padx=10, pady=5)
+        self.email_entry.insert(tk.END, email)
+
         # Campo Cuota con Combobox
-        tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
+        tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=5, column=0, padx=10, pady=5, sticky=tk.E)
 
         # Variable para almacenar la selección
         self.cuota_estado = tk.StringVar(value="AL DÍA")  # Valor por defecto
 
         # Combobox en lugar de OptionMenu
         self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO"], state="readonly", font=("Arial", 14))
-        self.cuota_menu.grid(row=4, column=1, padx=10, pady=5)
+        self.cuota_menu.grid(row=6, column=1, padx=10, pady=5)
 
         botones_frame = tk.Frame(main_frame)
-        botones_frame.grid(row=5, column=0, columnspan=2, pady=10)
+        botones_frame.grid(row=7, column=0, columnspan=2, pady=10)
 
         if editar:
             guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_alumno_editado(dni))
@@ -666,25 +672,31 @@ class InventarioApp:
         dni = self.entry_dni.get()
         metodo_pago = self.var_pago.get()
         fecha_pago = self.entry_fecha_pago.get()
+        
 
         if not hasattr(self, 'monto_a_pagar'):
             return  # No se puede registrar el pago si no se ha calculado el monto
 
         # Obtener los detalles del alumno
+        nombre = self.alumno_encontrado['nombre']
         
+        email_to = self.alumno_encontrado['email'] # Asegurar que el alumno tenga email
+        print(email_to)
 
         # Registrar el pago en el historial
-        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], fecha_pago,self.monto_a_pagar, metodo_pago)
-
+        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], fecha_pago,self.monto_a_pagar, metodo_pago, email_to)
+            # Enviar el comprobante si el alumno tiene correo registrado
+        if email_to:
+            enviar_comprobante(email_to, nombre, self.monto_a_pagar, fecha_pago, metodo_pago)
+        else:
+            print(f"⚠ No se pudo enviar comprobante: {nombre} no tiene correo registrado.")
         # Cerrar la ventana después de registrar el pago
         self.venta_finalizada = True
         self.ventanacobrar = False
         print(f"Pago de ${self.monto_a_pagar} registrado para {self.alumno_encontrado['nombre']} ({dni}).")
         self.actualizar_estado_cuota()
         
-
-
-    def registrar_pago_en_historial(self, dni, nombre, categoria, fecha_pago, monto, metodo_pago):
+    def registrar_pago_en_historial(self, dni, nombre, categoria, fecha_pago, monto, metodo_pago, email):
         archivo_historial = "historial_pagos.json"
 
         # Cargar historial existente si el archivo ya existe
@@ -710,7 +722,8 @@ class InventarioApp:
         historial_general[dni]["pagos"].append({
             "fecha": fecha_pago,
             "monto": monto,
-            "metodo_pago": metodo_pago
+            "metodo_pago": metodo_pago,
+            "email" : email
         })
 
         # Guardar todo en un solo archivo JSON
@@ -865,16 +878,17 @@ class InventarioApp:
         dni = self.dni_entry.get()
         categoria = self.categoria_entry.get()
         cuota_estado = self.cuota_estado.get()
+        email = self.email_entry.get() or "None"  # Si el email está vacío, se coloca "None"
 
-        # Validaciones
+        # Validaciones generales
         if not nombre or not apellido or not dni or not categoria or not cuota_estado:
-            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+            messagebox.showerror("Error", "Todos los campos excepto el email son obligatorios.")
             return
 
         # Validar que la categoría sea un año de nacimiento válido
         try:
             categoria = int(categoria)
-            current_year = datetime.datetime.now().year
+            current_year = datetime.now().year
             if categoria < 1900 or categoria > current_year:
                 raise ValueError("El año de nacimiento debe ser entre 1900 y el año actual.")
         except ValueError as e:
@@ -882,8 +896,7 @@ class InventarioApp:
             return
 
 
-
-        if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado):
+        if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado,email):
 
             # Mostrar mensaje de éxito
             messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
@@ -970,52 +983,6 @@ class InventarioApp:
     def scroll_text(self, *args):
         """Desplaza automáticamente el texto hacia abajo."""
         self.output_text_cobrar.yview(tk.END)
-    def cobrar_producto(self):
-        if self.venta_finalizada:
-            self.output_text_cobrar.insert(tk.END, "\nLa venta ya ha sido finalizada.\nNo se pueden añadir más productos.\n")
-            return
-
-        codigo_de_barras = self.entry_cobrar.get()
-        if codigo_de_barras:
-            producto = escanear_producto(codigo_de_barras)
-            if producto:
-                self.lista_alumnos.append(producto)
-                self.total += producto['precio']
-                self.output_text_cobrar.insert(tk.END, f"Producto añadido: {producto['nombre']} - ${producto['precio']:.2f}\n")
-
-                # Agregar el producto al carrito
-                if codigo_de_barras in self.carrito:
-                    self.carrito[codigo_de_barras]['cantidad'] += 1
-                else:
-                    self.carrito[codigo_de_barras] = {
-                        'producto': producto,
-                        'cantidad': 1
-                    }
-
-                # Comprobar el stock restante (temporalmente)
-                inventario = cargar_inventario()
-                stock_restante = inventario[codigo_de_barras]['cantidad'] - self.carrito[codigo_de_barras]['cantidad']
-                if stock_restante <= 3:
-                    self.output_text_cobrar.tag_config("rojo", foreground="red")
-                    self.output_text_cobrar.insert(tk.END, f"Advertencia: Stock bajo de {producto['nombre']}. Quedan {stock_restante} unidades.\n",("rojo"))
-
-                # Actualizar etiquetas de precio
-                precio_parcial = sum(item['producto']['precio'] * item['cantidad'] for item in self.carrito.values())
-                descuento = float(self.descuento_entry.get()) if self.descuento_entry.get() else 0
-                monto_descuento = precio_parcial * (descuento / 100)
-                precio_final = precio_parcial - monto_descuento
-
-                self.precio_parcial_label.config(text=f"Precio parcial: ${precio_parcial:.2f}")
-                self.descuento_monto_label.config(text=f"Descuento: ${monto_descuento:.2f}")
-                self.precio_final_label.config(text=f"Precio final: ${precio_final:.2f}")
-                self.total = precio_parcial
-                self.total_con_descuento=precio_final
-            else:
-                self.output_text_cobrar.insert(tk.END, "Producto no encontrado.\n")
-            self.output_text_cobrar.insert(tk.END, "-----------------------------------------------------------------------\n")
-            self.output_text_cobrar.see(tk.END)
-        self.entry_cobrar.delete(0, tk.END)
-
 
 
     def finalizar_venta(self):
@@ -1097,7 +1064,8 @@ class InventarioApp:
                     nombre=alumno["nombre"], 
                     apellido=alumno["apellido"], 
                     categoria=alumno["categoria"], 
-                    cuota_estado=alumno["cuota_estado"]
+                    cuota_estado=alumno["cuota_estado"],
+                    email=alumno["email"]
                 )
                 self.toggleAgregar()
 
@@ -1123,6 +1091,7 @@ class InventarioApp:
         categoria = self.categoria_entry.get()
         cuota_estado = self.cuota_estado.get()
         dni_nuevo = self.dni_entry.get()  # Nuevo DNI en caso de edición
+        email = self.email_entry.get()
 
         print(f"Valores ingresados en guardar_alumno_editado: dni={dni}, nombre={nombre}, apellido={apellido}, categoría={categoria}, cuota_estado={cuota_estado}")
 
@@ -1143,7 +1112,7 @@ class InventarioApp:
             return
 
         # Llamar a la función para modificar el alumno
-        if modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
+        if modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email):
             messagebox.showinfo("Éxito", "Alumno editado correctamente.")
             self.ventana_agregar.destroy()
             self.actualizar_vista_alumnos()

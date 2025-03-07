@@ -4,13 +4,7 @@
         "nombre": "Agustin",
         "apellido": "Goyechea",
         "categoria": "1998",
-        "cuota_estado": "AL DIA"
-    },
-    {
-        "dni": "78",
-        "nombre": "elian",
-        "apellido": "lele",
-        "categoria": 1999,
-        "cuota_estado": "AL DIA"
+        "cuota_estado": "AL DIA",
+        "email": "goyecheaagustin@gmail.com"
     }
 ]

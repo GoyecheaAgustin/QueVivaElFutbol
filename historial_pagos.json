@@ -5,31 +5,22 @@
         "categoria": "1998",
         "pagos": [
             {
-                "fecha": "04/02/2025",
+                "fecha": "07/03/2025",
                 "monto": 20000,
-                "metodo_pago": "Efectivo"
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
             },
             {
-                "fecha": "05/03/2025",
+                "fecha": "07/03/2025",
                 "monto": 20000,
-                "metodo_pago": "Efectivo"
-            }
-        ]
-    },
-    "78": {
-        "dni": "78",
-        "nombre": "elian",
-        "categoria": 1999,
-        "pagos": [
-            {
-                "fecha": "01/02/2025",
-                "monto": 20000,
-                "metodo_pago": "Efectivo"
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
             },
             {
-                "fecha": "05/03/2025",
+                "fecha": "07/03/2025",
                 "monto": 20000,
-                "metodo_pago": "Efectivo"
+                "metodo_pago": "Transferencia",
+                "email": "goyecheaagustin@gmail.com"
             }
         ]
     }

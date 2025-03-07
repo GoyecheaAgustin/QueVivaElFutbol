@@ -37,7 +37,7 @@ def escanear_alumno(codigo_de_barras):
 
 
 # Función para modificar un alumno
-def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
+def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email):
     alumnos = cargar_alumnos()  # Cargar la lista de alumnos
     alumno_encontrado = next((alumno for alumno in alumnos if alumno['dni'] == dni), None)
 
@@ -48,7 +48,8 @@ def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
             'nombre': nombre,
             'apellido': apellido,
             'categoria': categoria,
-            'cuota_estado': cuota_estado
+            'cuota_estado': cuota_estado,
+            'email' : email
         })
 
         # Guardar los cambios
@@ -57,12 +58,12 @@ def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo):
 
     return False
 
-    return False
+
 
 
 
 # Función para agregar un nuevo alumno
-def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado):
+def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado, email):
     alumnos = cargar_alumnos()  # Cargar la lista de alumnos
 
     # Verificar si el DNI ya existe
@@ -75,7 +76,8 @@ def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado):
         'nombre': nombre,
         'apellido': apellido,
         'categoria': categoria,
-        'cuota_estado': cuota_estado
+        'cuota_estado': cuota_estado,
+        'email': email
     }
     alumnos.append(nuevo_alumno)
 
