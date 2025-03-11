@@ -29,7 +29,8 @@ class InventarioApp:
         self.restrict_mode = BooleanVar()
         self.restrict_mode.set(self.cargar_estado_restriccion())
         self.alumno_encontrado = None
-
+        self.calendario_icono = tk.PhotoImage(file=self.resource_path("images/calendar.png")).subsample(2,2)    
+        self.buscar_icono = tk.PhotoImage(file=self.resource_path("images/buscar.png")).subsample(2,2)    
         nombre_label = tk.Label(self.master, text="Desarrollado por Agustin Goyechea V1.1", font=("Arial", 6))
         nombre_label.pack(side=tk.BOTTOM, pady=10)
 
@@ -156,8 +157,8 @@ class InventarioApp:
         if self.ventanabalance:
             return
         self.ventanabalance = True
-
         def actualizar_balance():
+            mostrar_mensaje("")
             for item in tree.get_children():
                 tree.delete(item)
             
@@ -167,8 +168,9 @@ class InventarioApp:
             try:
                 fecha_inicio_dt = datetime.strptime(fecha_inicio, "%d/%m/%Y")
                 fecha_fin_dt = datetime.strptime(fecha_fin, "%d/%m/%Y")
+                
             except ValueError:
-                mostrar_mensaje("Ingrese fechas válidas en formato dd/mm/aaaa")
+                mostrar_mensaje("Ingrese fechas válidas")
                 return
             
             total_efectivo = 0
@@ -188,18 +190,25 @@ class InventarioApp:
             for pago in pagos_realizados:
                 tree.insert("", tk.END, values=pago)
             
-            total_label.config(text=f"Total en efectivo: ${total_efectivo:.2f} | Total en transferencia: ${total_transferencia:.2f} | Total abonado: ${total_efectivo + total_transferencia:.2f}")
-            mostrar_mensaje("")
-        
-        def mostrar_mensaje(mensaje):
-            mensaje_label.config(text=mensaje)
-        
+            efectivo_value_label.config(text=f"${total_efectivo:.2f}")
+            transferencia_value_label.config(text=f"${total_transferencia:.2f}")
+            abonado_value_label.config(text=f"${total_efectivo + total_transferencia:.2f}")
         balance_window = tk.Toplevel(self.master)
         balance_window.title("Balance de Pagos")
-        
+            
+           
+        mensaje_label = tk.Label(balance_window, text="", font=("Arial", 12), fg="red", width=40)
+        mensaje_label.grid(row=5, column=0, columnspan=3, pady=5)
+
+        def mostrar_mensaje(mensaje):
+            """Muestra un mensaje en la etiqueta o lo borra si es vacío."""
+            mensaje_label.config(text=" " if mensaje == "" else mensaje)
+            mensaje_label.update_idletasks()  # Actualiza la interfaz para reflejar el cambio inmediatamente
+
+
         screen_width = balance_window.winfo_screenwidth()
         screen_height = balance_window.winfo_screenheight()
-        window_width = 900
+        window_width = 850
         window_height = 550
         x = (screen_width // 2) - (window_width // 2)
         y = (screen_height // 2) - (window_height // 2)
@@ -216,22 +225,23 @@ class InventarioApp:
                 historial_pagos = json.load(file)
         except FileNotFoundError:
             historial_pagos = {}
-        
+        balance_window.columnconfigure(1, weight=1)
         tk.Label(balance_window, text="Fecha inicio (dd/mm/aaaa):", font=("Arial", 12, "bold")).grid(row=0, column=0, pady=5, padx=10)
         date_entry_inicio = tk.Entry(balance_window, font=("Arial", 14))
-        date_entry_inicio.grid(row=0, column=1, pady=5, padx=5)
+        date_entry_inicio.grid(row=0, column=1, pady=5, padx=1,sticky="ew")
         
+      
         # Botón para seleccionar la fecha de inicio
-        calendario_button_inicio = tk.Button(balance_window, text="Seleccionar Fecha", font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_inicio))
-        calendario_button_inicio.grid(row=0, column=2, padx=5)
+        calendario_button_inicio = tk.Button(balance_window, image=self.calendario_icono, text="Seleccionar Fecha", font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_inicio))
+        calendario_button_inicio.grid(row=0, column=2, padx=2,sticky="w")
         
         tk.Label(balance_window, text="Fecha fin (dd/mm/aaaa):", font=("Arial", 12, "bold")).grid(row=1, column=0, pady=5, padx=10)
         date_entry_fin = tk.Entry(balance_window, font=("Arial", 14))
-        date_entry_fin.grid(row=1, column=1, pady=5, padx=5)
+        date_entry_fin.grid(row=1, column=1, pady=5, padx=1,sticky="ew")
         
         # Botón para seleccionar la fecha de fin
-        calendario_button_fin = tk.Button(balance_window, text="Seleccionar Fecha", font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_fin))
-        calendario_button_fin.grid(row=1, column=2, padx=5)
+        calendario_button_fin = tk.Button(balance_window,image=self.calendario_icono, font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_fin))
+        calendario_button_fin.grid(row=1, column=2, padx=5,sticky="w")
         tk.Button(balance_window, text="Mostrar Balance", command=actualizar_balance).grid(row=2, column=0, columnspan=3, pady=10)
         
         tree = ttk.Treeview(balance_window, columns=("Fecha", "Nombre", "Monto", "Método de Pago"), show="headings")
@@ -241,12 +251,31 @@ class InventarioApp:
         tree.heading("Método de Pago", text="Método de Pago")
         tree.grid(row=3, column=0, columnspan=3, padx=20, pady=10, sticky="nsew")
         
-        total_label = tk.Label(balance_window, text="Total en efectivo: $0.00 | Total en transferencia: $0.00 | Total abonado: $0.00", font=("Arial", 12, "bold"))
-        total_label.grid(row=4, column=0, columnspan=3, pady=10)
-        
-        mensaje_label = tk.Label(balance_window, text="", font=("Arial", 12))
-        mensaje_label.grid(row=5, column=0, columnspan=3, pady=10)
-        
+# Crear un marco para los totales
+        totales_frame = tk.Frame(balance_window)
+        totales_frame.grid(row=4, column=2, pady=10, sticky="e")
+
+        # Total en efectivo
+        total_label_efectivo = tk.Label(totales_frame, text="Total en efectivo:", font=("Arial", 14, "bold"))
+        total_label_efectivo.grid(row=0, column=0, sticky="w", padx=5)  # Alineado a la izquierda
+
+        efectivo_value_label = tk.Label(totales_frame, text="$0.00", font=("Arial", 14), anchor="e")
+        efectivo_value_label.grid(row=0, column=1, sticky="e", padx=5)  # Alineado a la derecha
+
+        # Total en transferencia
+        total_label_transferencia = tk.Label(totales_frame, text="Total en transferencia:", font=("Arial", 14, "bold"))
+        total_label_transferencia.grid(row=1, column=0, sticky="w", padx=5)  # Alineado a la izquierda
+
+        transferencia_value_label = tk.Label(totales_frame, text="$0.00", font=("Arial", 14), anchor="e")
+        transferencia_value_label.grid(row=1, column=1, sticky="e", padx=5)  # Alineado a la derecha
+
+        # Total abonado
+        total_label_abonado = tk.Label(totales_frame, text="Total abonado:", font=("Arial", 14, "bold"))
+        total_label_abonado.grid(row=2, column=0, sticky="w", padx=5)  # Alineado a la izquierda
+
+        abonado_value_label = tk.Label(totales_frame, text="$0.00", font=("Arial", 14), anchor="e")
+        abonado_value_label.grid(row=2, column=1, sticky="e", padx=5)  # Alineado a la derecha
+
         balance_window.update_idletasks()
 
 
@@ -381,9 +410,11 @@ class InventarioApp:
         label_dni.pack(side=tk.LEFT, padx=5)
         self.entry_dni = tk.Entry(input_frame, font=("Arial", 14), width=20)
         self.entry_dni.pack(side=tk.LEFT, padx=5)
+        self.entry_dni.bind("<Return>", lambda event: self.buscar_alumno_cuota())
+
 
         # Botón para buscar el alumno
-        buscar_button = tk.Button(input_frame, text="Buscar Alumno", font=("Arial", 14), command=self.buscar_alumno_cuota)
+        buscar_button = tk.Button(input_frame, image=self.buscar_icono, font=("Arial", 14), command=self.buscar_alumno_cuota)
         buscar_button.pack(side=tk.LEFT, padx=5)
 
         # Etiqueta para mostrar nombre y apellido
@@ -450,7 +481,7 @@ class InventarioApp:
 
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
         # Botón para seleccionar la fecha
-        calendario_button = tk.Button(pago_frame, text="Seleccionar Fecha", font=("Arial", 14), 
+        calendario_button = tk.Button(pago_frame,image=self.calendario_icono, font=("Arial", 14), 
                                     command=lambda: self.mostrar_calendario(self.entry_fecha_pago))
         calendario_button.grid(row=1, column=2, padx=5)
 
@@ -731,7 +762,7 @@ class InventarioApp:
         self.entry_buscar.bind("<Return>", lambda event: self.buscar_alumno())
 
         # Botón de búsqueda
-        buscar_button = tk.Button(search_frame, text="Buscar", font=("Arial", 14), command=self.buscar_alumno)
+        buscar_button = tk.Button(search_frame, image=self.buscar_icono, font=("Arial", 14), command=self.buscar_alumno)
         buscar_button.pack(side=tk.LEFT, padx=5)
         
 
