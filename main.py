@@ -178,7 +178,7 @@ class InventarioApp:
                 for pago in datos["pagos"]:
                     fecha_pago_dt = datetime.strptime(pago["fecha"], "%d/%m/%Y")
                     if fecha_inicio_dt <= fecha_pago_dt <= fecha_fin_dt:
-                        pagos_realizados.append((pago["fecha"], datos["nombre"], pago["monto"], pago["metodo_pago"]))
+                        pagos_realizados.append((pago["fecha"], datos["nombre"], datos["apellido"], pago["monto"], pago["metodo_pago"]))
                         if pago["metodo_pago"].lower() == "efectivo":
                             total_efectivo += pago["monto"]
                         else:
@@ -241,12 +241,19 @@ class InventarioApp:
         calendario_button_fin.grid(row=1, column=2, padx=2,sticky="w")
         tk.Button(balance_window, text="Mostrar Balance", command=actualizar_balance).grid(row=2, column=0, columnspan=3, pady=10)
         
-        tree = ttk.Treeview(balance_window, columns=("Fecha", "Nombre", "Monto", "Método de Pago"), show="headings")
+        tree = ttk.Treeview(balance_window, columns=("Fecha", "Nombre","Apellido", "Monto", "Método de Pago"), show="headings")
         tree.heading("Fecha", text="Fecha")
         tree.heading("Nombre", text="Nombre")
+        tree.heading("Apellido", text="Apellido")
         tree.heading("Monto", text="Monto")
         tree.heading("Método de Pago", text="Método de Pago")
-        tree.grid(row=3, column=0, columnspan=3, padx=20, pady=10, sticky="nsew")
+        # Ajustar el ancho de cada columna
+        tree.column("Fecha", width=80)  # Ancho en píxeles
+        tree.column("Nombre", width=100)
+        tree.column("Apellido", width=100)
+        tree.column("Monto", width=80, anchor="center")  # Centrar el texto
+        tree.column("Método de Pago", width=120)
+        tree.grid(row=3, column=0, columnspan=3, padx=5, pady=10, sticky="nsew")
         
 # Crear un marco para los totales
         totales_frame = tk.Frame(balance_window)
