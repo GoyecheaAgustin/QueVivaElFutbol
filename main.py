@@ -11,7 +11,7 @@ import json
 from tkcalendar import Calendar
 from tkinter import BooleanVar
 from generador_comprobante import generar_recibo_profesional
-
+import webbrowser
 
 class InventarioApp:
     def __init__(self, master):
@@ -241,7 +241,7 @@ class InventarioApp:
         
         # Botón para seleccionar la fecha de fin
         calendario_button_fin = tk.Button(balance_window,image=self.calendario_icono, font=("Arial", 14), command=lambda: self.mostrar_calendario(date_entry_fin))
-        calendario_button_fin.grid(row=1, column=2, padx=5,sticky="w")
+        calendario_button_fin.grid(row=1, column=2, padx=2,sticky="w")
         tk.Button(balance_window, text="Mostrar Balance", command=actualizar_balance).grid(row=2, column=0, columnspan=3, pady=10)
         
         tree = ttk.Treeview(balance_window, columns=("Fecha", "Nombre", "Monto", "Método de Pago"), show="headings")
@@ -412,7 +412,6 @@ class InventarioApp:
         self.entry_dni.pack(side=tk.LEFT, padx=5)
         self.entry_dni.bind("<Return>", lambda event: self.buscar_alumno_cuota())
 
-
         # Botón para buscar el alumno
         buscar_button = tk.Button(input_frame, image=self.buscar_icono, font=("Arial", 14), command=self.buscar_alumno_cuota)
         buscar_button.pack(side=tk.LEFT, padx=5)
@@ -430,11 +429,12 @@ class InventarioApp:
         self.label_historial.pack()
 
         # Crear Treeview para mostrar historial de pagos
-        self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Categoría', 'Fecha', 'Monto', 'Método de Pago'), show='headings')
+        self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Apellido', 'Categoría', 'Fecha', 'Monto', 'Método de Pago'), show='headings')
 
         # Configurar columnas
         self.tree.column('DNI', anchor=tk.CENTER, width=100)
         self.tree.column('Nombre', anchor=tk.W, width=150)
+        self.tree.column('Apellido', anchor=tk.W, width=150)
         self.tree.column('Categoría', anchor=tk.CENTER, width=100)
         self.tree.column('Fecha', anchor=tk.CENTER, width=100)
         self.tree.column('Monto', anchor=tk.CENTER, width=100)
@@ -443,6 +443,7 @@ class InventarioApp:
         # Configurar encabezados
         self.tree.heading('DNI', text='DNI', anchor=tk.CENTER)
         self.tree.heading('Nombre', text='Nombre', anchor=tk.W)
+        self.tree.heading('Apellido', text='Apellido', anchor=tk.W)
         self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER)
         self.tree.heading('Fecha', text='Fecha', anchor=tk.CENTER)
         self.tree.heading('Monto', text='Monto', anchor=tk.CENTER)
@@ -451,16 +452,13 @@ class InventarioApp:
         # Empacar el Treeview
         self.tree.pack(pady=10, fill='both', expand=True)
 
-
         # Insertar ejemplo de datos, reemplázalo con datos reales
-
-
         self.tree.pack(pady=5)
 
         # Mostrar métodos de pago, monto, recargo y total a pagar
         pago_frame = tk.Frame(ventana_cobrar)
         pago_frame.pack(pady=10)
-
+        self.tree.bind("<Double-1>", self.mostrar_factura)
         # Métodos de pago
         metodo_pago_label = tk.Label(pago_frame, text="Método de pago:", font=("Arial", 14))
         metodo_pago_label.grid(row=0, column=0, padx=10)
@@ -481,7 +479,7 @@ class InventarioApp:
 
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
         # Botón para seleccionar la fecha
-        calendario_button = tk.Button(pago_frame,image=self.calendario_icono, font=("Arial", 14), 
+        calendario_button = tk.Button(pago_frame, image=self.calendario_icono, font=("Arial", 14), 
                                     command=lambda: self.mostrar_calendario(self.entry_fecha_pago))
         calendario_button.grid(row=1, column=2, padx=5)
 
@@ -514,6 +512,55 @@ class InventarioApp:
         # Botón para registrar pago
         registrar_button = tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)
         registrar_button.grid(row=5, column=0, columnspan=3, pady=10)
+
+
+
+
+    def mostrar_factura(self, event):
+        # Obtener el item seleccionado del Treeview
+        item = self.tree.selection()
+        if not item:
+            return  # Si no se selecciona ninguna fila, no hacemos nada
+
+        # Obtener los valores de la fila seleccionada
+        alumno_nombre = self.tree.item(item, 'values')[1]  # Nombre del alumno (segunda columna)
+        print(self.tree.item(item, 'values'))
+        alumno_apellido = self.tree.item(item, 'values')[2]  # Apellido del alumno (segunda columna, asumiendo que apellido está en la misma columna, puedes ajustarlo)
+        fecha_pago = self.tree.item(item, 'values')[4]  # Fecha de pago (cuarta columna)
+        
+        # Convertir la fecha en formato "DD-MM-YYYY"
+        fecha_formateada = fecha_pago.replace("/", "-")  # Asegurarse que la fecha esté en formato DD-MM-YYYY
+        hora_pago = self.tree.item(item, 'values')[5]  # Obtener la hora desde el índice 5
+        hora_formateada = datetime.strptime(hora_pago, "%H:%M:%S").strftime("%H-%M-%S")
+
+
+        # Crear el nombre base del archivo PDF a partir del nombre y apellido del alumno y la fecha
+        nombre_base = f"recibo_pago_{alumno_nombre} {alumno_apellido}-{fecha_formateada}_{hora_formateada}"
+        print(nombre_base)
+        
+        # Directorio de los comprobantes
+        carpeta_comprobantes = "comprobantes"  # Asegúrate de que esta carpeta esté en la misma ubicación que tu script o cambia la ruta
+
+        # Buscar el archivo en la carpeta
+        archivos_en_carpeta = os.listdir(carpeta_comprobantes)
+        archivo_comprobante = None
+
+        # Buscar el archivo que coincida con el nombre base y la fecha
+        for archivo in archivos_en_carpeta:
+            if archivo.startswith(nombre_base) and archivo.endswith(".pdf"):
+                archivo_comprobante = archivo
+                break
+
+        # Si encontramos el archivo, lo abrimos
+        if archivo_comprobante:
+            ruta_comprobante = os.path.join(carpeta_comprobantes, archivo_comprobante)
+            # Usamos webbrowser para abrir el PDF en el navegador predeterminado
+            webbrowser.open(ruta_comprobante)
+        else:
+            print(f"No se encontró el archivo para {alumno_nombre} {alumno_apellido} con la fecha {fecha_formateada}")
+
+
+
 
 
     def mostrar_calendario(self, entry_widget):
@@ -603,12 +650,13 @@ class InventarioApp:
             self.tree.insert('', 'end', values=(
                 alumno["dni"], 
                 alumno["nombre"], 
+                alumno["apellido"],  # Agregar apellido aquí
                 alumno["categoria"], 
                 pago["fecha"], 
+                pago["hora"],
                 pago["monto"], 
                 pago["metodo_pago"]  # Se agrega el método de pago
             ))
-
 
 
     def calcular_monto_pago(self, event=None):
@@ -646,6 +694,7 @@ class InventarioApp:
         dni = self.entry_dni.get()
         metodo_pago = self.var_pago.get()
         fecha_pago = self.entry_fecha_pago.get()
+        hora_pago = datetime.now().strftime("%H:%M:%S")
         
 
         if not hasattr(self, 'monto_a_pagar'):
@@ -659,7 +708,7 @@ class InventarioApp:
         print(email_to)
 
         # Registrar el pago en el historial
-        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'], self.alumno_encontrado['categoria'], fecha_pago,self.monto_a_pagar, metodo_pago, email_to)
+        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'],self.alumno_encontrado['apellido'], self.alumno_encontrado['categoria'], fecha_pago,hora_pago,self.monto_a_pagar, metodo_pago, email_to)
             # Enviar el comprobante si el alumno tiene correo registrado
         if email_to:
             file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago)
@@ -673,7 +722,7 @@ class InventarioApp:
         print(f"Pago de ${self.monto_a_pagar} registrado para {self.alumno_encontrado['nombre']} ({dni}).")
         self.actualizar_estado_cuota()
         
-    def registrar_pago_en_historial(self, dni, nombre, categoria, fecha_pago, monto, metodo_pago, email):
+    def registrar_pago_en_historial(self, dni, nombre, apellido, categoria, fecha_pago,hora_pago, monto, metodo_pago, email):
         archivo_historial = "historial_pagos.json"
 
         # Cargar historial existente si el archivo ya existe
@@ -691,6 +740,7 @@ class InventarioApp:
             historial_general[dni] = {
                 "dni": dni,
                 "nombre": nombre,
+                "apellido": apellido,  # Agregar el apellido
                 "categoria": categoria,
                 "pagos": []
             }
@@ -698,9 +748,10 @@ class InventarioApp:
         # Agregar el nuevo pago al historial del alumno
         historial_general[dni]["pagos"].append({
             "fecha": fecha_pago,
+            "hora": hora_pago,
             "monto": monto,
             "metodo_pago": metodo_pago,
-            "email" : email
+            "email": email
         })
 
         # Guardar todo en un solo archivo JSON
@@ -709,6 +760,7 @@ class InventarioApp:
 
         # Actualizar el Treeview si es necesario
         self.mostrar_historial_pagos(dni)
+
 
 
     def obtener_historial_pago(self, dni):

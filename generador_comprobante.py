@@ -18,7 +18,7 @@ def generar_recibo_profesional(alumno, monto, metodo_pago):
     
     # Definir el nombre del archivo con la ruta completa
     fecha_hora = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")  # Evitar caracteres invalidos como ':'
-    fecha_hora1 = datetime.datetime.now().strftime("%d/%m/%Y_%H:%M:%S") 
+    fecha_hora1 = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") 
     pdf_filename = os.path.join(carpeta_destino, f"recibo_pago_{alumno}-{fecha_hora}.pdf")
 
     logo_path = "logo.png"
