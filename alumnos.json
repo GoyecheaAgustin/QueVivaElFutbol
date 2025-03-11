@@ -54,5 +54,13 @@
         "categoria": 1998,
         "cuota_estado": "AL DIA",
         "email": "alanbelarmino100@gmail.com"
+    },
+    {
+        "dni": "333",
+        "nombre": "lali",
+        "apellido": "esposito",
+        "categoria": 1995,
+        "cuota_estado": "AL DIA",
+        "email": "go"
     }
 ]

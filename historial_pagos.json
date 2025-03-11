@@ -25,6 +25,154 @@
                 "monto": 21000,
                 "metodo_pago": "Efectivo",
                 "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "07/02/2025",
+                "hora": "15:40:30",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:54:35",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:56:37",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            }
+        ]
+    },
+    "333": {
+        "dni": "333",
+        "nombre": "lali",
+        "apellido": "esposito",
+        "categoria": 1995,
+        "pagos": [
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:37:23",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "08/01/2025",
+                "hora": "15:39:23",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:17",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:19",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:21",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:23",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:25",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:27",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:29",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:31",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:33",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:35",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:37",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:39",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:41",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:43",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
+            },
+            {
+                "fecha": "11/03/2025",
+                "hora": "15:44:45",
+                "monto": 21000,
+                "metodo_pago": "Efectivo",
+                "email": "go"
             }
         ]
     }

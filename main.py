@@ -1,10 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from inventario import escanear_alumno, agregar_alumno, cargar_alumnos, modificar_alumno, eliminar, guardar_alumno
-from ventadiaria import guardar_venta_diaria
 from datetime import datetime
 from sender_mail import enviar_comprobante
-#import serial
 import os
 import sys
 import json
@@ -151,8 +149,7 @@ class InventarioApp:
         else:
             messagebox.showerror("Error", "Contraseña incorrecta.")
             self.entry_contraseña.delete(0, tk.END)
-
-
+    
     def mostrar_ventana_balance(self):
         if self.ventanabalance:
             return
@@ -277,9 +274,6 @@ class InventarioApp:
         abonado_value_label.grid(row=2, column=1, sticky="e", padx=5)  # Alineado a la derecha
 
         balance_window.update_idletasks()
-
-
-        
 
     def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado="",email=""):
         if self.ventanaagregar is not False:
@@ -513,9 +507,6 @@ class InventarioApp:
         registrar_button = tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)
         registrar_button.grid(row=5, column=0, columnspan=3, pady=10)
 
-
-
-
     def mostrar_factura(self, event):
         # Obtener el item seleccionado del Treeview
         item = self.tree.selection()
@@ -559,10 +550,6 @@ class InventarioApp:
         else:
             print(f"No se encontró el archivo para {alumno_nombre} {alumno_apellido} con la fecha {fecha_formateada}")
 
-
-
-
-
     def mostrar_calendario(self, entry_widget):
         # Crear la ventana emergente
         calendario_popup = tk.Toplevel(self.master)
@@ -593,8 +580,7 @@ class InventarioApp:
         # Botón para seleccionar la fecha
         seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
         seleccionar_button.pack(pady=10)
-
-            
+     
 
     def buscar_alumno_cuota(self):
         dni = self.entry_dni.get()
@@ -622,6 +608,7 @@ class InventarioApp:
 
         # Si el archivo no existe, salir de la función
         if not os.path.exists(archivo_historial):
+            
             return
 
         # Leer el historial general
@@ -633,9 +620,11 @@ class InventarioApp:
 
         # Obtener la información del alumno por DNI
         alumno = historial_general.get(dni, None)
+        self.limpiar_treeview()
 
         # Si el alumno no existe en el historial, salir de la función
         if not alumno:
+            
             return
 
         # Obtener la lista de pagos
@@ -657,6 +646,11 @@ class InventarioApp:
                 pago["monto"], 
                 pago["metodo_pago"]  # Se agrega el método de pago
             ))
+    
+    def limpiar_treeview(self):
+        """Función auxiliar para limpiar el Treeview."""
+        for item in self.tree.get_children():
+            self.tree.delete(item)
 
 
     def calcular_monto_pago(self, event=None):
@@ -761,8 +755,6 @@ class InventarioApp:
         # Actualizar el Treeview si es necesario
         self.mostrar_historial_pagos(dni)
 
-
-
     def obtener_historial_pago(self, dni):
         # Revisamos si existe el archivo de historial de pagos
         archivo_historial = f"historial_pagos.json"
@@ -853,8 +845,7 @@ class InventarioApp:
 
         # Empacar el árbol en la ventana
         self.tree.pack(pady=20)
-
-    
+   
     def resource_path(self, relative_path):
         """ Obtiene la ruta absoluta al recurso, funciona para desarrollo y para el ejecutable compilado. """
         try:
@@ -944,31 +935,10 @@ class InventarioApp:
             self.previous_window.focus_force()
 
 
-
-
-
-
-
-    def calcular_vuelto(self):
-        try:
-            total = self.total_con_descuento
-            monto_cliente = float(self.monto_cliente_entry.get())
-            if monto_cliente >= total:
-                vuelto = monto_cliente - total
-                self.vuelto_label.config(text=f"Vuelto: ${vuelto:.2f}")
-            else:
-                messagebox.showerror("Error", "El monto recibido es menor que el total a pagar.")
-        except ValueError:
-            messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos.")
-
-
-
     def scroll_text(self, *args):
         """Desplaza automáticamente el texto hacia abajo."""
         self.output_text_cobrar.yview(tk.END)
-
-
-                
+            
 
     def toggleAlumnos(self):
         self.ventanaAlumnos = False

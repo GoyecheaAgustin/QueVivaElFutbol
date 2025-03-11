@@ -3,6 +3,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication  # Necesario para adjuntar el PDF
 from datetime import datetime
+import tkinter as tk
+from tkinter import ttk, messagebox
 
 def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
     # Configuración del servidor SMTP
@@ -59,7 +61,9 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
         server.login(email_user, email_password)
         server.sendmail(email_user, email_to, msg.as_string())
         server.quit()  # Cerrar la conexión
-        print(f"✅ Comprobante enviado a {email_to}")
+        
+        # Mostrar mensaje de éxito
+        messagebox.showinfo("Éxito", f"✅ Comprobante enviado a {email_to}")
     except Exception as e:
-        print(f"❌ Error al enviar el correo: {e}")
-
+        # Mostrar mensaje de error
+        messagebox.showerror("Error", f"❌ Error al enviar el correo: {e}")
