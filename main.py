@@ -24,6 +24,7 @@ class InventarioApp:
         self.ventanabalance = False
         self.total_con_descuento = 0 
         self.total_con_descuento = 0
+        self.cuota_base = 0
         self.restrict_mode = BooleanVar()
         self.restrict_mode.set(self.cargar_estado_restriccion())
         self.alumno_encontrado = None
@@ -287,7 +288,7 @@ class InventarioApp:
             return
 
         self.previous_window = self.master.focus_get()
-        self.ventanaagregar = True
+        self.ventana = True
         self.ventana_agregar = tk.Toplevel(self.master)
         self.ventana_agregar.title("Agregar Nuevo Alumno" if not editar else "Editar Alumno")
 
@@ -340,10 +341,10 @@ class InventarioApp:
 
         # Combobox en lugar de OptionMenu
         self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO"], state="readonly", font=("Arial", 14))
-        self.cuota_menu.grid(row=6, column=1, padx=10, pady=5)
+        self.cuota_menu.grid(row=5, column=1, padx=10, pady=5)
 
         botones_frame = tk.Frame(main_frame)
-        botones_frame.grid(row=7, column=0, columnspan=2, pady=10)
+        botones_frame.grid(row=6, column=0, columnspan=2, pady=10)
 
         if editar:
             guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_alumno_editado(dni))
@@ -385,7 +386,7 @@ class InventarioApp:
 
         ventana_cobrar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
         
-        ancho_ventana = 700
+        ancho_ventana = 850
         alto_ventana = 650
         ventana_cobrar.geometry(f"{ancho_ventana}x{alto_ventana}")
 
@@ -430,7 +431,7 @@ class InventarioApp:
         self.label_historial.pack()
 
         # Crear Treeview para mostrar historial de pagos
-        self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Apellido', 'Categoría', 'Fecha', 'Monto', 'Método de Pago'), show='headings')
+        self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Apellido', 'Categoría', 'Fecha','Hora', 'Monto', 'Método de Pago'), show='headings')
 
         # Configurar columnas
         self.tree.column('DNI', anchor=tk.CENTER, width=100)
@@ -438,8 +439,9 @@ class InventarioApp:
         self.tree.column('Apellido', anchor=tk.W, width=150)
         self.tree.column('Categoría', anchor=tk.CENTER, width=100)
         self.tree.column('Fecha', anchor=tk.CENTER, width=100)
-        self.tree.column('Monto', anchor=tk.CENTER, width=100)
-        self.tree.column('Método de Pago', anchor=tk.W, width=120)
+        self.tree.column('Hora', anchor=tk.CENTER, width=50)
+        self.tree.column('Monto', anchor=tk.CENTER, width=50)
+        self.tree.column('Método de Pago', anchor=tk.W, width=100)
 
         # Configurar encabezados
         self.tree.heading('DNI', text='DNI', anchor=tk.CENTER)
@@ -447,6 +449,7 @@ class InventarioApp:
         self.tree.heading('Apellido', text='Apellido', anchor=tk.W)
         self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER)
         self.tree.heading('Fecha', text='Fecha', anchor=tk.CENTER)
+        self.tree.heading('Hora', text='Hora', anchor=tk.CENTER)
         self.tree.heading('Monto', text='Monto', anchor=tk.CENTER)
         self.tree.heading('Método de Pago', text='Método de Pago', anchor=tk.W)
 
@@ -475,44 +478,49 @@ class InventarioApp:
         fecha_pago_label.grid(row=1, column=0, padx=10)
         fecha_actual = tk.StringVar()
         fecha_actual.set(self.obtener_fecha_actual())  # Fecha actual
+    
         self.entry_fecha_pago = tk.Entry(pago_frame, textvariable=fecha_actual, font=("Arial", 14), width=10)
         self.entry_fecha_pago.grid(row=1, column=1, padx=5)
+        
 
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
         # Botón para seleccionar la fecha
         calendario_button = tk.Button(pago_frame, image=self.calendario_icono, font=("Arial", 14), 
                                     command=lambda: self.mostrar_calendario(self.entry_fecha_pago))
         calendario_button.grid(row=1, column=2, padx=5)
+       
 
 
         # Monto y recargo
         # Cuadro de pago
-        monto_label = tk.Label(pago_frame, text="Monto de Cuota: $", font=("Arial", 14))
-        monto_label.grid(row=2, column=0, padx=10)
+              # Etiqueta y campo de entrada para el monto de la cuota
+        tk.Label(pago_frame, text="Monto de Cuota: $", font=("Arial", 14)).grid(row=2, column=0, padx=10)
+        self.entry_monto = tk.Entry(pago_frame, font=("Arial", 14))
+        self.entry_monto.grid(row=2, column=1, padx=5)
+        self.entry_monto.bind("<KeyRelease>", self.calcular_monto_pago)  # Se actualiza automáticamente al escribir
 
-        # Mostrar la cuota fija (ejemplo: $20000)
-        self.cuota_base = 20000
-        self.label_monto = tk.Label(pago_frame, text=f"{self.cuota_base:.2f}", font=("Arial", 14))
-        self.label_monto.grid(row=2, column=1, padx=5)
+        # Etiqueta para mostrar el monto ingresado
+        self.label_monto = tk.Label(pago_frame, text="0.00", font=("Arial", 14))
+     
 
         # Etiqueta de recargo
-        recargo_label = tk.Label(pago_frame, text="Recargo: $", font=("Arial", 14))
-        recargo_label.grid(row=3, column=0, padx=10)
+        tk.Label(pago_frame, text="Recargo: $", font=("Arial", 14)).grid(row=3, column=0, padx=10)
         self.label_recargo = tk.Label(pago_frame, text="0.0", font=("Arial", 14))
         self.label_recargo.grid(row=3, column=1, padx=5)
 
         # Total a pagar
-        total_label = tk.Label(pago_frame, text="Total a Pagar: $", font=("Arial", 14))
-        total_label.grid(row=4, column=0, padx=10)
-        self.label_total = tk.Label(pago_frame, text=f"{self.cuota_base:.2f}", font=("Arial", 14))
+        tk.Label(pago_frame, text="Total a Pagar: $", font=("Arial", 14)).grid(row=4, column=0, padx=10)
+        self.label_total = tk.Label(pago_frame, text="0.00", font=("Arial", 14))
         self.label_total.grid(row=4, column=1, padx=5)
+        # Botón para registrar pago centrado sin que sea muy grueso
+        tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)\
+            .grid(row=5, column=0, columnspan=3, pady=10, sticky="nsew", padx=100)
 
-        # Vincular la fecha para que actualice el total automáticamente
-        self.entry_fecha_pago.bind("<KeyRelease>", self.calcular_monto_pago)
 
-        # Botón para registrar pago
-        registrar_button = tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)
-        registrar_button.grid(row=5, column=0, columnspan=3, pady=10)
+
+        
+
+
 
     def mostrar_factura(self, event):
         # Obtener el item seleccionado del Treeview
@@ -583,7 +591,7 @@ class InventarioApp:
             entry_widget.delete(0, tk.END)  # Limpiar el campo de entrada
             entry_widget.insert(0, fecha_seleccionada)  # Insertar la fecha seleccionada
             calendario_popup.destroy()  # Cerrar el calendario
-
+        
         # Botón para seleccionar la fecha
         seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
         seleccionar_button.pack(pady=10)
@@ -659,10 +667,10 @@ class InventarioApp:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-
     def calcular_monto_pago(self, event=None):
         """Calcula el recargo y actualiza el total cuando se ingresa la fecha de pago."""
         fecha_pago = self.entry_fecha_pago.get()
+        print("ffddsaadaaadsada")
 
         if fecha_pago:
             try:
@@ -679,6 +687,13 @@ class InventarioApp:
                 monto_adicional = 0  # Si la fecha no es válida, no aplicar recargo
         else:
             monto_adicional = 0
+        
+        try:
+            self.cuota_base = float(self.entry_monto.get())
+            self.label_monto.config(text=f"{self.cuota_base:.2f}")
+        except ValueError:
+            self.label_total.config(text="Monto inválido")
+            return
 
         # Calcular el monto total
         monto_total = self.cuota_base + monto_adicional
@@ -689,8 +704,7 @@ class InventarioApp:
 
         # Guardar el monto total en la variable de la clase
         self.monto_a_pagar = monto_total
-
-
+        
     def registrar_pago(self):
         dni = self.entry_dni.get()
         metodo_pago = self.var_pago.get()
@@ -698,10 +712,11 @@ class InventarioApp:
         hora_pago = datetime.now().strftime("%H:%M:%S")
         
 
-        if not hasattr(self, 'monto_a_pagar'):
-            return  # No se puede registrar el pago si no se ha calculado el monto
-
-        # Obtener los detalles del alumno
+        if not hasattr(self, 'monto_a_pagar') or not isinstance(self.monto_a_pagar, (int, float)) or self.monto_a_pagar <= 0:
+            print("❌ No se puede registrar el pago: monto inválido.")
+            self.label_total.config(text="Monto inválido")
+            return  # Salir de la función sin registrar el pago
+            # Obtener los detalles del alumno
         nombre = self.alumno_encontrado['nombre']
         
         completo=nombre+" "+self.alumno_encontrado['apellido']

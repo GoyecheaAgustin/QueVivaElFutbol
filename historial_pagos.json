@@ -46,6 +46,20 @@
                 "monto": 21000,
                 "metodo_pago": "Efectivo",
                 "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "13/03/2025",
+                "hora": "09:16:32",
+                "monto": 4000.0,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
+            },
+            {
+                "fecha": "13/03/2025",
+                "hora": "09:19:09",
+                "monto": 1005.0,
+                "metodo_pago": "Efectivo",
+                "email": "goyecheaagustin@gmail.com"
             }
         ]
     },
