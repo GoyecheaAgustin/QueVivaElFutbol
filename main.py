@@ -38,7 +38,7 @@ class InventarioApp:
         self.sell_icon = tk.PhotoImage(file=self.resource_path("images/cobro.png"))
         self.view_icon = tk.PhotoImage(file=self.resource_path("images/lista.png"))
         self.caja_icon = tk.PhotoImage(file=self.resource_path("images/balance.png"))  # Asegúrate de tener esta imagen
-       
+
 
         self.buttons_frame = tk.Frame(master)
         self.buttons_frame.pack(pady=20)
@@ -47,13 +47,13 @@ class InventarioApp:
         self.add_button = tk.Button(self.buttons_frame, text="Agregar Alumno", image=self.add_icon, compound=tk.LEFT, command=self.mostrar_ventana_agregar,  state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.add_button.pack(side=tk.LEFT, padx=10)
 
-        self.sell_button = tk.Button(self.buttons_frame, text="Cobrar", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cuota)
+        self.sell_button = tk.Button(self.buttons_frame, text="Cobrar", image=self.sell_icon, compound=tk.LEFT, command=self.mostrar_ventana_cuota, state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.sell_button.pack(side=tk.LEFT, padx=10)
 
         self.view_button = tk.Button(self.buttons_frame, text="Lista Alumnos", image=self.view_icon, compound=tk.LEFT, command=self.mostrar_ventana_alumnos)
         self.view_button.pack(side=tk.LEFT, padx=10)
 
-        self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_balance)
+        self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_balance, state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.caja_button.pack(side=tk.LEFT, padx=10)
         # Añadir el switch de restricción
         self.restrict_switch = tk.Checkbutton(self.master, text="Modo Restricción", variable=self.restrict_mode, command=self.toggle_restriccion)

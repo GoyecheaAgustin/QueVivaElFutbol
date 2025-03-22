@@ -62,5 +62,21 @@
         "categoria": 1995,
         "cuota_estado": "AL DIA",
         "email": "go"
+    },
+    {
+        "dni": "1234566777",
+        "nombre": "beto",
+        "apellido": "mnmn",
+        "categoria": 1986,
+        "cuota_estado": "AL DIA",
+        "email": "n"
+    },
+    {
+        "dni": "131323",
+        "nombre": "agsutin",
+        "apellido": "goyechea",
+        "categoria": "1986",
+        "cuota_estado": "AL DIA",
+        "email": "goyecheaagustin@gmail.com"
     }
 ]

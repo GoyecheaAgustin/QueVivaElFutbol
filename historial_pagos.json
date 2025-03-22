@@ -189,5 +189,20 @@
                 "email": "go"
             }
         ]
+    },
+    "123456789": {
+        "dni": "123456789",
+        "nombre": "Beto",
+        "apellido": "Goyechea",
+        "categoria": 1986,
+        "pagos": [
+            {
+                "fecha": "22/03/2025",
+                "hora": "00:26:02",
+                "monto": 17000.0,
+                "metodo_pago": "Efectivo",
+                "email": "betogoyechea@gmail.com"
+            }
+        ]
     }
 }
