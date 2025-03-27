@@ -687,6 +687,8 @@ class InventarioApp:
                 monto_adicional = 0  # Si la fecha no es válida, no aplicar recargo
         else:
             monto_adicional = 0
+
+
         
         try:
             self.cuota_base = float(self.entry_monto.get())
@@ -697,9 +699,16 @@ class InventarioApp:
 
         # Calcular el monto total
         monto_total = self.cuota_base + monto_adicional
+        print("total ", monto_total)
+        monto_adicional_aux = monto_adicional
+        if self.var_pago.get() == "Transferencia":
+            monto_adicional=monto_total*0.015
+            print(monto_adicional)
+        monto_adicional_aux += monto_adicional
+        monto_total = self.cuota_base + monto_adicional_aux
 
         # Actualizar los valores en la interfaz
-        self.label_recargo.config(text=f"{monto_adicional:.2f}")
+        self.label_recargo.config(text=f"{monto_adicional_aux:.2f}")
         self.label_total.config(text=f"{monto_total:.2f}")
 
         # Guardar el monto total en la variable de la clase
