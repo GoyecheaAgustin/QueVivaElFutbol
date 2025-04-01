@@ -16,7 +16,8 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
     # Crear el mensaje
     msg = MIMEMultipart()
     msg["From"] = email_user
-    msg["To"] = email_to
+    print(email_to.lower())
+    msg["To"] = email_to.lower()
     msg["Subject"] = f"Comprobante de Pago - {alumno}"
 
     # Obtener la fecha y hora actual

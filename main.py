@@ -313,11 +313,10 @@ class InventarioApp:
         tk.Label(main_frame, text="Tutor:", font=("Arial", 14)).grid(row=0, column=0, padx=10, pady=5, sticky=tk.E)
         self.tutor_entry = tk.Entry(main_frame, font=("Arial", 14))
         self.tutor_entry.grid(row=0, column=1, padx=10, pady=5)
-
+        self.tutor_entry.focus_set()
         # Campo Nombre
         tk.Label(main_frame, text="Nombre:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
         self.nombre_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.nombre_entry.focus_set()
         self.nombre_entry.grid(row=1, column=1, padx=10, pady=5)
 
         # Campo Apellido
@@ -500,8 +499,8 @@ class InventarioApp:
         metodo_pago_label.grid(row=0, column=0, padx=10)
         self.var_pago = tk.StringVar()
         self.var_pago.set("Efectivo")  # Valor por defecto
-        efectivo_radio = tk.Radiobutton(pago_frame, text="Efectivo", variable=self.var_pago, value="Efectivo", font=("Arial", 14))
-        transferencia_radio = tk.Radiobutton(pago_frame, text="Transferencia", variable=self.var_pago, value="Transferencia", font=("Arial", 14))
+        efectivo_radio = tk.Radiobutton(pago_frame, text="Efectivo", variable=self.var_pago, value="Efectivo", font=("Arial", 14),command=self.calcular_monto_pago)
+        transferencia_radio = tk.Radiobutton(pago_frame, text="Transferencia", variable=self.var_pago, value="Transferencia", font=("Arial", 14),command=self.calcular_monto_pago)
         efectivo_radio.grid(row=0, column=1, padx=5)
         transferencia_radio.grid(row=0, column=2, padx=5)
 
@@ -728,7 +727,7 @@ class InventarioApp:
         print("total ", monto_total)
         monto_adicional_aux = monto_adicional
         if self.var_pago.get() == "Transferencia":
-            monto_adicional=monto_total*0.015
+            monto_adicional=1000
             print(monto_adicional)
         monto_adicional_aux += monto_adicional
         monto_total = self.cuota_base + monto_adicional_aux

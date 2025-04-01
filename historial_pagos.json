@@ -1,0 +1,24 @@
+{
+    "55617311": {
+        "dni": "55617311",
+        "nombre": "LIAN AGUSTIN",
+        "apellido": "CHAVEZ",
+        "categoria": 2016,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "15:18:48",
+                "monto": 16000.0,
+                "metodo_pago": "Transferencia",
+                "email": "LULICHAVEZ22@gmail.com"
+            },
+            {
+                "fecha": "01/04/2025",
+                "hora": "15:34:00",
+                "monto": 16000.0,
+                "metodo_pago": "Transferencia",
+                "email": "LULICHAVEZ222@GMAIL.COM"
+            }
+        ]
+    }
+}
