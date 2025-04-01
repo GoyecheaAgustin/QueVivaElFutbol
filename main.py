@@ -10,6 +10,8 @@ from tkcalendar import Calendar
 from tkinter import BooleanVar
 from generador_comprobante import generar_recibo_profesional
 import webbrowser
+import tkinter as tk
+import ttkbootstrap as ttk  # Importamos ttkbootstrap para los estilos modernos
 
 class InventarioApp:
     def __init__(self, master):
@@ -21,6 +23,7 @@ class InventarioApp:
         self.lista_alumnos = []
         self.venta_finalizada = False
         self.ventanacobrar = False
+        self.ventana_contraseña = None  # Inicializa la variable
         self.ventanabalance = False
         self.total_con_descuento = 0 
         self.total_con_descuento = 0
@@ -100,6 +103,8 @@ class InventarioApp:
             self.solicitar_contraseña()
 
     def solicitar_contraseña(self):
+        if self.ventana_contraseña is not None and tk.Toplevel.winfo_exists(self.ventana_contraseña):
+            return  # Evita abrir múltiples ventanas
         # Crear una ventana emergente para la contraseña
         self.ventana_contraseña = tk.Toplevel(self.master)
         self.ventana_contraseña.title("Ingresar Contraseña")
@@ -118,9 +123,10 @@ class InventarioApp:
 
         self.entry_contraseña = tk.Entry(self.ventana_contraseña, show="*", font=("Arial", 14))
         self.entry_contraseña.pack(pady=10)
-
+        self.entry_contraseña.focus_set()
         boton_aceptar = tk.Button(self.ventana_contraseña, text="Aceptar", font=("Arial", 14), command=self.verificar_contraseña)
         boton_aceptar.pack(pady=10)
+        self.ventana_contraseña.bind("<Return>", lambda event: self.verificar_contraseña())
 
         # Obtener el tamaño de la pantalla
         screen_width = self.ventana_contraseña.winfo_screenwidth()
