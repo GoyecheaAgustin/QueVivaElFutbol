@@ -11,7 +11,7 @@ from tkinter import BooleanVar
 from generador_comprobante import generar_recibo_profesional
 import webbrowser
 import tkinter as tk
-import ttkbootstrap as ttk  # Importamos ttkbootstrap para los estilos modernos
+
 
 class InventarioApp:
     def __init__(self, master):
@@ -289,7 +289,7 @@ class InventarioApp:
 
         balance_window.update_idletasks()
 
-    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado="",email=""):
+    def mostrar_ventana_agregar(self, editar=False, nombre="", apellido="", dni="", categoria="", cuota_estado="",email="",ficha="", telefono="",tutor=""):
         if self.ventanaagregar is not False:
             return
 
@@ -309,64 +309,90 @@ class InventarioApp:
         main_frame = tk.Frame(self.ventana_agregar, padx=10, pady=10)
         main_frame.pack(expand=True, fill=tk.BOTH)
 
+        # Campo Tutor (primero)
+        tk.Label(main_frame, text="Tutor:", font=("Arial", 14)).grid(row=0, column=0, padx=10, pady=5, sticky=tk.E)
+        self.tutor_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.tutor_entry.grid(row=0, column=1, padx=10, pady=5)
+
         # Campo Nombre
-        tk.Label(main_frame, text="Nombre:", font=("Arial", 14)).grid(row=0, column=0, padx=10, pady=5, sticky=tk.E)
+        tk.Label(main_frame, text="Nombre:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
         self.nombre_entry = tk.Entry(main_frame, font=("Arial", 14))
         self.nombre_entry.focus_set()
-        self.nombre_entry.grid(row=0, column=1, padx=10, pady=5)
-        self.nombre_entry.insert(tk.END, nombre)
+        self.nombre_entry.grid(row=1, column=1, padx=10, pady=5)
 
         # Campo Apellido
-        tk.Label(main_frame, text="Apellido:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky=tk.E)
+        tk.Label(main_frame, text="Apellido:", font=("Arial", 14)).grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
         self.apellido_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.apellido_entry.grid(row=1, column=1, padx=10, pady=5)
-        self.apellido_entry.insert(tk.END, apellido)
+        self.apellido_entry.grid(row=2, column=1, padx=10, pady=5)
 
         # Campo DNI
-        tk.Label(main_frame, text="DNI:", font=("Arial", 14)).grid(row=2, column=0, padx=10, pady=5, sticky=tk.E)
+        tk.Label(main_frame, text="DNI:", font=("Arial", 14)).grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
         self.dni_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.dni_entry.grid(row=2, column=1, padx=10, pady=5)
-        self.dni_entry.insert(tk.END, dni)
+        self.dni_entry.grid(row=3, column=1, padx=10, pady=5)
 
         # Campo Categoría
-        tk.Label(main_frame, text="Categoría:", font=("Arial", 14)).grid(row=3, column=0, padx=10, pady=5, sticky=tk.E)
+        tk.Label(main_frame, text="Categoría:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
         self.categoria_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.categoria_entry.grid(row=3, column=1, padx=10, pady=5)
-        self.categoria_entry.insert(tk.END, categoria)
+        self.categoria_entry.grid(row=4, column=1, padx=10, pady=5)
 
-        tk.Label(main_frame, text="Email:", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky=tk.E)
+        # Campo Email
+        tk.Label(main_frame, text="Email:", font=("Arial", 14)).grid(row=5, column=0, padx=10, pady=5, sticky=tk.E)
         self.email_entry = tk.Entry(main_frame, font=("Arial", 14))
-        self.email_entry.grid(row=4, column=1, padx=10, pady=5)
-        self.email_entry.insert(tk.END, email)
+        self.email_entry.grid(row=5, column=1, padx=10, pady=5)
+
+        # Campo Teléfono
+        tk.Label(main_frame, text="Teléfono:", font=("Arial", 14)).grid(row=6, column=0, padx=10, pady=5, sticky=tk.E)
+        self.telefono_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.telefono_entry.grid(row=6, column=1, padx=10, pady=5)
 
         # Campo Cuota con Combobox
-        tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=5, column=0, padx=10, pady=5, sticky=tk.E)
-
-        # Variable para almacenar la selección
-        self.cuota_estado = tk.StringVar(value="AL DÍA")  # Valor por defecto
-
-        # Combobox en lugar de OptionMenu
+        tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=7, column=0, padx=10, pady=5, sticky=tk.E)
+        self.cuota_estado = tk.StringVar(value="AL DÍA")
         self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO"], state="readonly", font=("Arial", 14))
-        self.cuota_menu.grid(row=5, column=1, padx=10, pady=5)
+        self.cuota_menu.grid(row=7, column=1, padx=10, pady=5)
 
+        # Campo Ficha
+        tk.Label(main_frame, text="Ficha:", font=("Arial", 14)).grid(row=8, column=0, padx=10, pady=5, sticky=tk.E)
+        self.ficha_entry = tk.Entry(main_frame, font=("Arial", 14))
+        self.ficha_entry.grid(row=8, column=1, padx=10, pady=5)
+
+        # Frame para los botones (posición corregida)
         botones_frame = tk.Frame(main_frame)
-        botones_frame.grid(row=6, column=0, columnspan=2, pady=10)
+        botones_frame.grid(row=9, column=0, columnspan=2, pady=15)  # Movido a la fila 9 para evitar superposición
+
+        if editar:
+            # Si estamos en modo edición, llenar los campos con los valores del alumno
+            self.tutor_entry.delete(0, tk.END)
+            self.tutor_entry.insert(0, tutor)
+            self.nombre_entry.delete(0, tk.END)
+            self.nombre_entry.insert(0, nombre)                        
+            self.apellido_entry.delete(0, tk.END)
+            self.apellido_entry.insert(0, apellido)
+            self.dni_entry.delete(0, tk.END)
+            self.dni_entry.insert(0, dni)
+            self.categoria_entry.delete(0, tk.END)
+            self.categoria_entry.insert(0, categoria)
+            self.email_entry.delete(0, tk.END)
+            self.email_entry.insert(0, email)
+            self.telefono_entry.delete(0, tk.END)
+            self.telefono_entry.insert(0, telefono)
+            self.cuota_menu.set(cuota_estado)
+            self.ficha_entry.delete(0,tk.END)
+            self.ficha_entry.insert(0,ficha)
 
         if editar:
             guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_alumno_editado(dni))
-            guardar_button.pack(side=tk.LEFT, padx=5)
+            guardar_button.grid(row=0, column=0, padx=5)
             eliminar_button = tk.Button(botones_frame, text="Eliminar", font=("Arial", 14), command=lambda: self.eliminar_alumno(dni))
-            eliminar_button.pack(side=tk.LEFT, padx=5)
-
+            eliminar_button.grid(row=0, column=1, padx=5)
         else:
             agregar_button = tk.Button(botones_frame, text="Agregar", font=("Arial", 14), command=self.agregar_alumno)
-            agregar_button.pack(side=tk.LEFT, padx=5)
+            agregar_button.grid(row=0, column=0, padx=5)
 
         # Centrar la ventana en la pantalla
         self.ventana_agregar.update_idletasks()
         width = self.ventana_agregar.winfo_width()
         height = self.ventana_agregar.winfo_height()
-
         x = (self.ventana_agregar.winfo_screenwidth() // 2) - (width // 2)
         y = (self.ventana_agregar.winfo_screenheight() // 2) - (height // 2)
         self.ventana_agregar.geometry(f"{width}x{height}+{x}+{y-100}")
@@ -521,12 +547,6 @@ class InventarioApp:
         # Botón para registrar pago centrado sin que sea muy grueso
         tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)\
             .grid(row=5, column=0, columnspan=3, pady=10, sticky="nsew", padx=100)
-
-
-
-        
-
-
 
     def mostrar_factura(self, event):
         # Obtener el item seleccionado del Treeview
@@ -930,12 +950,16 @@ class InventarioApp:
 
     def agregar_alumno(self):
         # Obtener los valores de los campos de entrada
-        nombre = self.nombre_entry.get()
-        apellido = self.apellido_entry.get()
-        dni = self.dni_entry.get()
-        categoria = self.categoria_entry.get()
-        cuota_estado = self.cuota_estado.get()
+        tutor = self.tutor_entry.get()  # Obtener el valor del campo Tutor
+        nombre = self.nombre_entry.get()  # Obtener el valor del campo Nombre
+        apellido = self.apellido_entry.get()  # Obtener el valor del campo Apellido
+        dni = self.dni_entry.get()  # Obtener el valor del campo DNI
+        categoria = self.categoria_entry.get()  # Obtener el valor del campo Categoría
+        cuota_estado = self.cuota_estado.get()  # Obtener el valor del campo Cuota
         email = self.email_entry.get() or "None"  # Si el email está vacío, se coloca "None"
+        telefono = self.telefono_entry.get() 
+        ficha = self.ficha_entry.get()  # Obtener el valor del campo Ficha
+
 
         # Validaciones generales
         if not nombre or not apellido or not dni or not categoria or not cuota_estado:
@@ -953,7 +977,7 @@ class InventarioApp:
             return
 
 
-        if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado,email):
+        if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado,email,tutor,ficha,telefono):
 
             # Mostrar mensaje de éxito
             messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
@@ -996,6 +1020,7 @@ class InventarioApp:
 
             # Buscar el alumno en la lista
             alumno = next((a for a in alumnos if a["dni"] == dni_alumno), None)
+            print(alumno)
 
             if alumno:
                 # Mostrar ventana similar a agregar alumno pero con datos del alumno seleccionado
@@ -1007,7 +1032,10 @@ class InventarioApp:
                     apellido=alumno["apellido"], 
                     categoria=alumno["categoria"], 
                     cuota_estado=alumno["cuota_estado"],
-                    email=alumno["email"]
+                    email=alumno["email"],
+                    ficha=alumno["ficha"],
+                    telefono=alumno["telefono"],
+                    tutor=alumno["tutor"]
                 )
                 self.toggleAgregar()
 
@@ -1028,12 +1056,15 @@ class InventarioApp:
 
 
     def guardar_alumno_editado(self, dni):
-        nombre = self.nombre_entry.get()
-        apellido = self.apellido_entry.get()
-        categoria = self.categoria_entry.get()
-        cuota_estado = self.cuota_estado.get()
-        dni_nuevo = self.dni_entry.get()  # Nuevo DNI en caso de edición
-        email = self.email_entry.get()
+        tutor = self.tutor_entry.get()  # Obtener el valor del campo Tutor
+        nombre = self.nombre_entry.get()  # Obtener el valor del campo Nombre
+        apellido = self.apellido_entry.get()  # Obtener el valor del campo Apellido
+        dni_nuevo = self.dni_entry.get()  # Obtener el valor del campo DNI
+        categoria = self.categoria_entry.get()  # Obtener el valor del campo Categoría
+        cuota_estado = self.cuota_estado.get()  # Obtener el valor del campo Cuota
+        email = self.email_entry.get() or "None"  # Si el email está vacío, se coloca "None"
+        telefono = self.telefono_entry.get() 
+        ficha = self.ficha_entry.get()  # Obtener el valor del campo Ficha
 
         print(f"Valores ingresados en guardar_alumno_editado: dni={dni}, nombre={nombre}, apellido={apellido}, categoría={categoria}, cuota_estado={cuota_estado}")
 
@@ -1054,7 +1085,7 @@ class InventarioApp:
             return
 
         # Llamar a la función para modificar el alumno
-        if modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email):
+        if modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email,ficha, telefono, tutor):
             messagebox.showinfo("Éxito", "Alumno editado correctamente.")
             self.ventana_agregar.destroy()
             self.actualizar_vista_alumnos()
@@ -1107,7 +1138,7 @@ class InventarioApp:
         alumnos_path='alumnos.json'
         historial_path='historial_pagos.json'
         # Cargar los archivos JSON
-        with open(alumnos_path, 'r') as f:
+        with open(alumnos_path, 'r', encoding='utf-8') as f:
             alumnos = json.load(f)
 
         # Verificar si el archivo historial_pagos.json existe
@@ -1121,6 +1152,7 @@ class InventarioApp:
         fecha_actual = datetime.now()
 
         for alumno in alumnos:
+            print(alumno)
             dni = alumno["dni"]
             # Inicializamos el estado de cuota como "AL DIA"
             alumno["cuota_estado"] = "AL DIA"
@@ -1146,8 +1178,8 @@ class InventarioApp:
                     alumno["cuota_estado"] = "AL DIA"
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")                 
         # Guardar los cambios en el archivo alumnos.json
-        with open(alumnos_path, 'w') as f:
-            json.dump(alumnos, f, indent=4)
+        with open(alumnos_path, 'w',encoding='utf-8') as f:
+            json.dump(alumnos, f, indent=4,ensure_ascii=False)
 
 
 

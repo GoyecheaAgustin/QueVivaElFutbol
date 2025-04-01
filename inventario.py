@@ -8,13 +8,15 @@ def cargar_alumnos():
     if not os.path.exists(alumnos_FILE):  # Si el archivo no existe, crea uno vacío
         return []
     
-    with open(alumnos_FILE, 'r') as file:
+    with open(alumnos_FILE, 'r', encoding='utf-8') as file:
         contenido = file.read().strip()  # Leer y eliminar espacios en blanco
         if not contenido:  # Si está vacío, devuelve una lista vacía
             return []
         
         try:
             alumnos = json.loads(contenido)
+            
+            
             if isinstance(alumnos, list):  # Asegurar que es una lista
                 return alumnos
             else:
@@ -23,12 +25,14 @@ def cargar_alumnos():
         except json.JSONDecodeError:
             print("Error: El archivo JSON está corrupto. Se reiniciará.")
             return [] 
-        
-# Función para guardar el alumno en el archivo JSON
+
 def guardar_alumno(alumno):
-    with open(alumnos_FILE, 'w') as file:
-        print("holaaaaa")
-        json.dump(alumno, file, indent=4)
+    alumnos = cargar_alumnos()  # Cargar los alumnos existentes
+    alumnos.append(alumno)  # Agregar el nuevo alumno a la lista
+    
+    with open(alumnos_FILE, 'w', encoding='utf-8') as file:
+        json.dump(alumnos, file, indent=4, ensure_ascii=False)
+    print("Alumno guardado exitosamente.")
 
 # Función para escanear un alumno
 def escanear_alumno(codigo_de_barras):
@@ -37,19 +41,23 @@ def escanear_alumno(codigo_de_barras):
 
 
 # Función para modificar un alumno
-def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email):
+def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, email, ficha, telefono, tutor):
     alumnos = cargar_alumnos()  # Cargar la lista de alumnos
     alumno_encontrado = next((alumno for alumno in alumnos if alumno['dni'] == dni), None)
 
     if alumno_encontrado:
         # Actualizar los datos del alumno
         alumno_encontrado.update({
-            'dni': dni_nuevo,
-            'nombre': nombre,
-            'apellido': apellido,
+            'dni': dni_nuevo.upper(),
+            'nombre': nombre.upper(),
+            'apellido': apellido.upper(),
             'categoria': categoria,
-            'cuota_estado': cuota_estado,
-            'email' : email
+            'cuota_estado': cuota_estado.upper(),
+            'tutor': tutor.upper(),
+            'email': email.upper(),
+            'ficha': ficha.upper(),
+            'telefono': telefono
+
         })
 
         # Guardar los cambios
@@ -63,7 +71,7 @@ def modificar_alumno(dni, nombre, apellido, categoria, cuota_estado, dni_nuevo, 
 
 
 # Función para agregar un nuevo alumno
-def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado, email):
+def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado, email,tutor,ficha):
     alumnos = cargar_alumnos()  # Cargar la lista de alumnos
 
     # Verificar si el DNI ya existe
@@ -72,12 +80,14 @@ def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado, email):
 
     # Agregar el nuevo alumno
     nuevo_alumno = {
-        'dni': dni,
-        'nombre': nombre,
-        'apellido': apellido,
-        'categoria': categoria,
-        'cuota_estado': cuota_estado,
-        'email': email
+        'Tutor': tutor.upper(),
+        'dni': dni.upper(),
+        'nombre': nombre.upper(),
+        'apellido': apellido.upper(),
+        'categoria': categoria,  # Si es número, convertirlo a string
+        'cuota_estado': cuota_estado.upper(),
+        'email': email.upper(),
+        'Ficha': ficha.upper()
     }
     alumnos.append(nuevo_alumno)
 
@@ -104,3 +114,31 @@ def eliminar(dni):
         # Si no se encontró el alumno, retornar False
         return False
 
+
+
+def convertir_mayusculas(dato):
+    if isinstance(dato, dict):  
+        return {k: convertir_mayusculas(v) for k, v in dato.items()}
+    elif isinstance(dato, list):  
+        return [convertir_mayusculas(item) for item in dato]
+    elif isinstance(dato, str):  
+        return dato.upper()
+    else:  
+        return dato
+
+# Leer el archivo JSON
+with open(alumnos_FILE, 'r', encoding='utf-8') as file:
+    contenido = file.read().strip()  
+
+# Verificar si el archivo no está vacío
+if contenido:
+    alumnos = json.loads(contenido)  # Convertir el texto JSON en un diccionario
+    alumnos_mayus = convertir_mayusculas(alumnos)  # Convertir a mayúsculas
+
+    # Guardar el JSON con los valores en mayúsculas
+    with open(alumnos_FILE, 'w', encoding='utf-8') as file:
+        json.dump(alumnos_mayus, file, indent=4, ensure_ascii=False)
+
+    print("JSON convertido a mayúsculas y guardado correctamente.")
+else:
+    print("El archivo está vacío.")
