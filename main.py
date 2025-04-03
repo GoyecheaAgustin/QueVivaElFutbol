@@ -865,7 +865,6 @@ class InventarioApp:
         buscar_button = tk.Button(search_frame, image=self.buscar_icono, font=("Arial", 14), command=self.buscar_alumno)
         buscar_button.pack(side=tk.LEFT, padx=5)
         
-
         # Árbol de alumnos
         self.tree = ttk.Treeview(self.ventana_alumnos)
         self.tree['columns'] = ('DNI', 'Nombre', 'Apellido', 'Categoría', 'Cuota')
@@ -878,13 +877,36 @@ class InventarioApp:
         self.tree.column('Categoría', anchor=tk.CENTER, width=100)
         self.tree.column('Cuota', anchor=tk.CENTER, width=150)
 
-        # Definir los encabezados
+        # Diccionario para controlar el estado de ordenamiento
+        self.orden_actual = {}
+
+        # Función para ordenar la tabla al hacer clic en los encabezados
+        def ordenar_por_columna(columna):
+            orden = self.orden_actual.get(columna, "asc")
+
+            # Obtener los datos actuales
+            datos = [(self.tree.set(item, columna), item) for item in self.tree.get_children("")]
+            
+            # Intentar convertir a número si es posible
+            try:
+                datos.sort(key=lambda x: int(x[0]), reverse=(orden == "desc"))
+            except ValueError:
+                datos.sort(key=lambda x: x[0], reverse=(orden == "desc"))
+
+            # Alternar el orden para la próxima vez
+            self.orden_actual[columna] = "desc" if orden == "asc" else "asc"
+
+            # Reordenar los elementos en el Treeview
+            for index, (val, item) in enumerate(datos):
+                self.tree.move(item, "", index)
+
+        # Definir los encabezados con opción de ordenar
         self.tree.heading('#0', text='', anchor=tk.W)
-        self.tree.heading('DNI', text='DNI', anchor=tk.CENTER)
-        self.tree.heading('Nombre', text='Nombre', anchor=tk.W)
-        self.tree.heading('Apellido', text='Apellido', anchor=tk.W)
-        self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER)
-        self.tree.heading('Cuota', text='Cuota', anchor=tk.CENTER)
+        self.tree.heading('DNI', text='DNI', anchor=tk.CENTER, command=lambda: ordenar_por_columna('DNI'))
+        self.tree.heading('Nombre', text='Nombre', anchor=tk.W, command=lambda: ordenar_por_columna('Nombre'))
+        self.tree.heading('Apellido', text='Apellido', anchor=tk.W, command=lambda: ordenar_por_columna('Apellido'))
+        self.tree.heading('Categoría', text='Categoría', anchor=tk.CENTER, command=lambda: ordenar_por_columna('Categoría'))
+        self.tree.heading('Cuota', text='Cuota', anchor=tk.CENTER, command=lambda: ordenar_por_columna('Cuota'))
 
         # Establecer el tamaño de la altura de las filas
         self.tree['height'] = 20
@@ -901,7 +923,7 @@ class InventarioApp:
 
         # Empacar el árbol en la ventana
         self.tree.pack(pady=20)
-   
+    
     def resource_path(self, relative_path):
         """ Obtiene la ruta absoluta al recurso, funciona para desarrollo y para el ejecutable compilado. """
         try:
