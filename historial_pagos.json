@@ -20,5 +20,27 @@
                 "email": "LULICHAVEZ222@GMAIL.COM"
             }
         ]
+    },
+    "41049800": {
+        "dni": "41049800",
+        "nombre": "LELELELE",
+        "apellido": "DADAS",
+        "categoria": 1998,
+        "pagos": [
+            {
+                "fecha": "07/04/2025",
+                "hora": "09:34:23",
+                "monto": 30000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "07/04/2025",
+                "hora": "09:38:19",
+                "monto": 30303.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            }
+        ]
     }
 }

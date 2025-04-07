@@ -6,7 +6,7 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
+def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path,tutor):
     # Configuración del servidor SMTP
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
@@ -25,11 +25,13 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
 
     # Cuerpo del mensaje
     body = f"""
-    Estimado/a {alumno},  
+    Estimado/a {tutor},  
 
-    Esperamos que este mensaje le encuentre bien.  
+    Primero, esperamos que este mensaje le encuentre bien.  
 
-    Le confirmamos que hemos registrado correctamente su pago con los siguientes detalles:  
+    Segundo, Francia.
+
+    Tercero, le confirmamos que hemos registrado correctamente su pago con los siguientes detalles:  
 
     📌 Detalles del Pago
     --------------------------------  
@@ -42,7 +44,7 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path):
 
     Atentamente,  
 
-    ⚽ ¡Que viva el fútbol!  
+    ⚽ ¡Que viva el fútbol! ⚽
     """  
 
     # Adjuntar el cuerpo del mensaje

@@ -78,7 +78,7 @@ def agregar_alumno(dni, nombre, apellido, categoria, cuota_estado, email,tutor,f
 
     # Agregar el nuevo alumno
     nuevo_alumno = {
-        'Tutor': tutor.upper(),
+        'tutor': tutor.upper(),
         'dni': dni.upper(),
         'nombre': nombre.upper(),
         'apellido': apellido.upper(),

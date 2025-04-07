@@ -745,6 +745,7 @@ class InventarioApp:
         fecha_pago = self.entry_fecha_pago.get()
         hora_pago = datetime.now().strftime("%H:%M:%S")
         
+        
 
         if not hasattr(self, 'monto_a_pagar') or not isinstance(self.monto_a_pagar, (int, float)) or self.monto_a_pagar <= 0:
             print("❌ No se puede registrar el pago: monto inválido.")
@@ -752,6 +753,7 @@ class InventarioApp:
             return  # Salir de la función sin registrar el pago
             # Obtener los detalles del alumno
         nombre = self.alumno_encontrado['nombre']
+        tutor = self.alumno_encontrado['tutor']
         
         completo=nombre+" "+self.alumno_encontrado['apellido']
         email_to = self.alumno_encontrado['email'] # Asegurar que el alumno tenga email
@@ -762,7 +764,7 @@ class InventarioApp:
             # Enviar el comprobante si el alumno tiene correo registrado
         if email_to:
             file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago)
-            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file)
+            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor)
 
         else:
             print(f"⚠ No se pudo enviar comprobante: {nombre} no tiene correo registrado.")
