@@ -347,7 +347,7 @@ class InventarioApp:
         # Campo Cuota con Combobox
         tk.Label(main_frame, text="Cuota:", font=("Arial", 14)).grid(row=7, column=0, padx=10, pady=5, sticky=tk.E)
         self.cuota_estado = tk.StringVar(value="AL DÍA")
-        self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO"], state="readonly", font=("Arial", 14))
+        self.cuota_menu = ttk.Combobox(main_frame, textvariable=self.cuota_estado, values=["AL DÍA", "MOROSO", "BECADO"], state="readonly", font=("Arial", 14))
         self.cuota_menu.grid(row=7, column=1, padx=10, pady=5)
 
         # Campo Ficha
@@ -517,7 +517,7 @@ class InventarioApp:
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
         # Botón para seleccionar la fecha
         calendario_button = tk.Button(pago_frame, image=self.calendario_icono, font=("Arial", 14), 
-                                    command=lambda: self.mostrar_calendario(self.entry_fecha_pago))
+                                    command=lambda: self.mostrar_calendario(self.entry_fecha_pago, self.calcular_monto_pago))
         calendario_button.grid(row=1, column=2, padx=5)
        
 
@@ -590,7 +590,7 @@ class InventarioApp:
         else:
             print(f"No se encontró el archivo para {alumno_nombre} {alumno_apellido} con la fecha {fecha_formateada}")
 
-    def mostrar_calendario(self, entry_widget):
+    def mostrar_calendario(self, entry_widget,callback=None):
         # Crear la ventana emergente
         calendario_popup = tk.Toplevel(self.master)
         calendario_popup.title("Seleccionar Fecha")
@@ -617,7 +617,8 @@ class InventarioApp:
             entry_widget.insert(0, fecha_seleccionada)  # Insertar la fecha seleccionada
             calendario_popup.destroy()  # Cerrar el calendario
 
-            self.calcular_monto_pago()
+        if callback:
+            callback()
             
         
         # Botón para seleccionar la fecha
@@ -754,6 +755,7 @@ class InventarioApp:
         hora_pago = datetime.now().strftime("%H:%M:%S")
         
         
+        
 
         if not hasattr(self, 'monto_a_pagar') or not isinstance(self.monto_a_pagar, (int, float)) or self.monto_a_pagar <= 0:
             print("❌ No se puede registrar el pago: monto inválido.")
@@ -771,7 +773,7 @@ class InventarioApp:
         self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'],self.alumno_encontrado['apellido'], self.alumno_encontrado['categoria'], fecha_pago,hora_pago,self.monto_a_pagar, metodo_pago, email_to)
             # Enviar el comprobante si el alumno tiene correo registrado
         if email_to:
-            file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago)
+            file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago, hora_pago, fecha_pago)
             enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor)
 
         else:
@@ -1166,8 +1168,9 @@ class InventarioApp:
             self.tree.insert('', tk.END, values=(alumno['dni'], alumno['nombre'], alumno['apellido'], alumno['categoria'], alumno['cuota_estado']))
 
     def actualizar_estado_cuota(self):
-        alumnos_path='alumnos.json'
-        historial_path='historial_pagos.json'
+        alumnos_path = 'alumnos.json'
+        historial_path = 'historial_pagos.json'
+
         # Cargar los archivos JSON
         with open(alumnos_path, 'r', encoding='utf-8') as f:
             alumnos = json.load(f)
@@ -1183,15 +1186,19 @@ class InventarioApp:
         fecha_actual = datetime.now()
 
         for alumno in alumnos:
-            print(alumno)
             dni = alumno["dni"]
+
+            # Si el alumno está becado, no hacemos ningún cambio
+            if alumno.get("cuota_estado") == "BECADO":
+                continue
+
             # Inicializamos el estado de cuota como "AL DIA"
             alumno["cuota_estado"] = "AL DIA"
 
             # Verificar si el alumno tiene historial de pagos
             if dni in historial_pagos:
                 pagos = historial_pagos[dni]["pagos"]
-                
+
                 # Si el alumno tiene pagos
                 if pagos:
                     # Obtener la última fecha de pago
@@ -1204,13 +1211,11 @@ class InventarioApp:
                     # Si han pasado más de 29 días, actualizar el estado a "MOROSO"
                     if dias_diferencia > 29:
                         alumno["cuota_estado"] = "MOROSO"
-                else:
-                    # Si no hay pagos, mantener el estado como "AL DIA"
-                    alumno["cuota_estado"] = "AL DIA"
-        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")                 
+
         # Guardar los cambios en el archivo alumnos.json
-        with open(alumnos_path, 'w',encoding='utf-8') as f:
-            json.dump(alumnos, f, indent=4,ensure_ascii=False)
+        with open(alumnos_path, 'w', encoding='utf-8') as f:
+            json.dump(alumnos, f, indent=4, ensure_ascii=False)
+
 
 
 

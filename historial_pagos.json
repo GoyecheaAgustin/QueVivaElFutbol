@@ -40,6 +40,41 @@
                 "monto": 30303.0,
                 "metodo_pago": "Efectivo",
                 "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "06/03/2025",
+                "hora": "10:01:38",
+                "monto": 16000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "17/03/2025",
+                "hora": "10:42:04",
+                "monto": 18000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "08/04/2025",
+                "hora": "10:42:49",
+                "monto": 16000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "03/03/2025",
+                "hora": "10:44:40",
+                "monto": 160000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "12/02/2025",
+                "hora": "10:45:55",
+                "monto": 17000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
             }
         ]
     }

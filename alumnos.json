@@ -1,9 +1,9 @@
 [
     {
-        "dni": "3333333333",
+        "dni": "333",
         "nombre": "ENZO VALENTINO",
         "apellido": "MORENO GARAY",
-        "categoria": 2012,
+        "categoria": "2012",
         "tutor": "JOSE MORENO",
         "email": "JMORENO@DONCASIMIRO.COM.AR",
         "telefono": "3764352415",
@@ -102,7 +102,7 @@
         "dni": "52525556",
         "nombre": "LAUTARO DAVID",
         "apellido": "DIAZ",
-        "categoria": 2012,
+        "categoria": "2012",
         "tutor": "CESAR DANIEL DIAZ",
         "email": "CESARDANIELDIAZ8GMAIL.COM",
         "telefono": "3764862884",
@@ -676,7 +676,7 @@
         "nombre": "LELELELE",
         "apellido": "DADAS",
         "categoria": 1998,
-        "cuota_estado": "AL DIA",
+        "cuota_estado": "MOROSO",
         "email": "NITSUGA022@GMAIL.COM",
         "telefono": "",
         "ficha": ""

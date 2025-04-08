@@ -1,24 +1,27 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
-import datetime
+from datetime import datetime
 import os
-
 # Función para generar el PDF del recibo profesional
 import os
-import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 
-def generar_recibo_profesional(alumno, monto, metodo_pago):
+def generar_recibo_profesional(alumno, monto, metodo_pago,hora, fecha ):
     carpeta_destino = "comprobantes"  # Nombre de la carpeta donde se guardará el PDF
     if not os.path.exists(carpeta_destino):  # Si la carpeta no existe, la creamos
         os.makedirs(carpeta_destino)
     
+
+    fecha_str = fecha+" "+hora
+    # Parsear el string a objeto datetime
+    fecha_dt = datetime.strptime(fecha_str, "%d/%m/%Y %H:%M:%S")
+
     # Definir el nombre del archivo con la ruta completa
-    fecha_hora = datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")  # Evitar caracteres invalidos como ':'
-    fecha_hora1 = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S") 
+    fecha_hora = fecha_dt.strftime("%d-%m-%Y_%H-%M-%S")  # Evitar caracteres invalidos como ':'
+    fecha_hora1 = fecha_dt.strftime("%d/%m/%Y %H:%M:%S") 
     pdf_filename = os.path.join(carpeta_destino, f"recibo_pago_{alumno}-{fecha_hora}.pdf")
 
     logo_path = "logo.png"
