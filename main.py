@@ -633,14 +633,16 @@ class InventarioApp:
             entry_widget.delete(0, tk.END)  # Limpiar el campo de entrada
             entry_widget.insert(0, fecha_seleccionada)  # Insertar la fecha seleccionada
             calendario_popup.destroy()  # Cerrar el calendario
+            if callback:
+                callback()
 
-        if callback:
-            callback()
+        
             
         
         # Botón para seleccionar la fecha
         seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
         seleccionar_button.pack(pady=10)
+
         
         
      
