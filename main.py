@@ -11,7 +11,7 @@ from tkinter import BooleanVar
 from generador_comprobante import generar_recibo_profesional
 import webbrowser
 import tkinter as tk
-
+from PIL import Image, ImageTk
 
 class InventarioApp:
     def __init__(self, master):
@@ -461,6 +461,22 @@ class InventarioApp:
         self.label_historial = tk.Label(self.historial_frame, text="Historial de Pagos:", font=("Arial", 14))
         self.label_historial.pack()
 
+        icono_original = Image.open(self.resource_path("images/delete.png"))
+        icono_redimensionado = icono_original.resize((20, 20))  # Ajustá el tamaño a gusto
+        self.delete_icon = ImageTk.PhotoImage(icono_redimensionado)
+
+        boton_eliminar_pago = tk.Button(
+            self.historial_frame,
+            image=self.delete_icon,
+            command=self.eliminar_pago_seleccionado,
+            bd=1,  # Sin borde
+            width=20,
+            height=20
+        )
+
+        # Lo movés hacia la derecha con padding (padx)
+        boton_eliminar_pago.pack(pady=5, padx=30, anchor="ne")  # 'ne' = north-east (arriba a la derecha)
+
         # Crear Treeview para mostrar historial de pagos
         self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Apellido', 'Categoría', 'Fecha','Hora', 'Monto', 'Método de Pago'), show='headings')
 
@@ -589,6 +605,7 @@ class InventarioApp:
             webbrowser.open(ruta_comprobante)
         else:
             print(f"No se encontró el archivo para {alumno_nombre} {alumno_apellido} con la fecha {fecha_formateada}")
+
 
     def mostrar_calendario(self, entry_widget,callback=None):
         # Crear la ventana emergente
@@ -1215,6 +1232,51 @@ class InventarioApp:
         # Guardar los cambios en el archivo alumnos.json
         with open(alumnos_path, 'w', encoding='utf-8') as f:
             json.dump(alumnos, f, indent=4, ensure_ascii=False)
+
+    def eliminar_pago_seleccionado(self):
+        seleccionado = self.tree.selection()
+        if not seleccionado:
+            messagebox.showwarning("Advertencia", "Por favor seleccione un pago para eliminar.")
+            return
+
+        datos = self.tree.item(seleccionado[0], 'values')
+        dni, nombre, apellido, categoria, fecha, hora, monto, metodo = datos
+
+        confirmacion = messagebox.askyesno("Confirmar", f"¿Deseas eliminar el pago del {fecha} a las {hora} por ${monto}?")
+        if not confirmacion:
+            return
+
+        # Eliminar del JSON
+        try:
+            with open("historial_pagos.json", "r", encoding="utf-8") as f:
+                historial = json.load(f)
+
+            if dni in historial:
+                pagos = historial[dni]["pagos"]
+                pagos_filtrados = [p for p in pagos if not (p["fecha"] == fecha and p["hora"] == hora and p["monto"] == float(monto) and p["metodo_pago"] == metodo)]
+                historial[dni]["pagos"] = pagos_filtrados
+
+                with open("historial_pagos.json", "w", encoding="utf-8") as f:
+                    json.dump(historial, f, indent=4, ensure_ascii=False)
+
+            # Construir nombre de archivo PDF
+            nombre_completo = nombre+" "+apellido
+            fecha_formato = fecha.replace("/", "-")
+            hora_formato = hora.replace(":", "-")
+            nombre_archivo = f"recibo_pago_{nombre_completo}-{fecha_formato}_{hora_formato}.pdf"
+            ruta_archivo = os.path.join("comprobantes", nombre_archivo)
+
+            if os.path.exists(ruta_archivo):
+                os.remove(ruta_archivo)
+                print("Comprobante eliminado:", ruta_archivo)
+            else:
+                print("No se encontró el comprobante:", ruta_archivo)
+
+            self.tree.delete(seleccionado[0])
+            messagebox.showinfo("Éxito", "Pago eliminado correctamente.")
+
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo eliminar el pago: {str(e)}")
 
 
 
