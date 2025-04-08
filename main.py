@@ -616,10 +616,15 @@ class InventarioApp:
             entry_widget.delete(0, tk.END)  # Limpiar el campo de entrada
             entry_widget.insert(0, fecha_seleccionada)  # Insertar la fecha seleccionada
             calendario_popup.destroy()  # Cerrar el calendario
+
+            self.calcular_monto_pago()
+            
         
         # Botón para seleccionar la fecha
         seleccionar_button = tk.Button(calendario_popup, text="Seleccionar Fecha", command=seleccionar_fecha)
         seleccionar_button.pack(pady=10)
+        
+        
      
 
     def buscar_alumno_cuota(self):
@@ -700,18 +705,19 @@ class InventarioApp:
         if fecha_pago:
             try:
                 dia_pago = int(fecha_pago.split("/")[0])  # Obtener solo el día
+                print(dia_pago)
                 if dia_pago > 10 and dia_pago<17:
-                    monto_adicional = 1000  # Recargo de $1000 por semana de retraso
+                    monto_mora = 1000  # Recargo de $1000 por semana de retraso
                 elif dia_pago > 16 and dia_pago<24:
-                    monto_adicional = 2000 
+                    monto_mora = 2000 
                 elif dia_pago > 23 and dia_pago<32:
-                    monto_adicional = 3000
+                    monto_mora = 3000
                 else:
-                    monto_adicional  = 0
+                    monto_mora  = 0
             except ValueError:
-                monto_adicional = 0  # Si la fecha no es válida, no aplicar recargo
+                monto_mora = 0  # Si la fecha no es válida, no aplicar recargo
         else:
-            monto_adicional = 0
+            monto_mora = 0
 
 
         
@@ -723,17 +729,19 @@ class InventarioApp:
             return
 
         # Calcular el monto total
-        monto_total = self.cuota_base + monto_adicional
-        print("total ", monto_total)
-        monto_adicional_aux = monto_adicional
+        monto_transfe = 0
+        
+        
         if self.var_pago.get() == "Transferencia":
-            monto_adicional=1000
-            print(monto_adicional)
-        monto_adicional_aux += monto_adicional
-        monto_total = self.cuota_base + monto_adicional_aux
+            monto_transfe = 1000
+            print(monto_mora)
+        else:
+            monto_transfe = 0
+        monto_total = self.cuota_base + monto_mora + monto_transfe
+        print("total ", monto_total)
 
         # Actualizar los valores en la interfaz
-        self.label_recargo.config(text=f"{monto_adicional_aux:.2f}")
+        self.label_recargo.config(text=f"{monto_mora+monto_transfe:.2f}")
         self.label_total.config(text=f"{monto_total:.2f}")
 
         # Guardar el monto total en la variable de la clase
