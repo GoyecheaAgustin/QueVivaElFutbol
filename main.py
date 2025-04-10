@@ -1018,15 +1018,22 @@ class InventarioApp:
             messagebox.showerror("Error", "Todos los campos excepto el email son obligatorios.")
             return
 
-        # Validar que la categoría sea un año de nacimiento válido
+        # Validar que la categoría sea un año válido o un texto como "Escuelita"
         try:
-            categoria = int(categoria)
             current_year = datetime.now().year
-            if categoria < 1900 or categoria > current_year:
-                raise ValueError("El año de nacimiento debe ser entre 1900 y el año actual.")
-        except ValueError as e:
+            if categoria.isdigit():
+                categoria_int = int(categoria)
+                if categoria_int < 1900 or categoria_int > current_year:
+                    raise ValueError("El año de nacimiento debe estar entre 1900 y el año actual.")
+                # Si es un número válido, lo seguimos usando como string para uniformidad
+                categoria = str(categoria_int)
+            else:
+                # Podrías agregar más validaciones si querés limitar qué textos son válidos
+                categoria = categoria.strip().title()  # Ej: "escuelita" -> "Escuelita"
+        except Exception as e:
             messagebox.showerror("Error", f"Categoría inválida: {str(e)}")
             return
+
 
 
         if agregar_alumno(dni,nombre,apellido,categoria,cuota_estado,email,tutor,ficha,telefono):
