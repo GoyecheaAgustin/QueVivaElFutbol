@@ -9,7 +9,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 
-def generar_recibo_profesional(alumno, monto, metodo_pago,hora, fecha ):
+def generar_recibo_profesional(alumno, monto, metodo_pago,hora, fecha, mes_a_pagar ):
     carpeta_destino = "comprobantes"  # Nombre de la carpeta donde se guardará el PDF
     if not os.path.exists(carpeta_destino):  # Si la carpeta no existe, la creamos
         os.makedirs(carpeta_destino)
@@ -56,9 +56,11 @@ def generar_recibo_profesional(alumno, monto, metodo_pago,hora, fecha ):
     # Detalles de la transacción
     c.setFont("Helvetica", 10)
     c.drawString(50, 480, f"Alumno: {alumno}")
-    c.drawString(50, 460, f"Monto: {monto} Pesos")
-    c.drawString(50, 440, f"Fecha y Hora de Pago: {fecha_hora1}")
-    c.drawString(50, 420, f"Método de Pago: {metodo_pago}")
+    c.drawString(50, 465, f"Mes pagado: {mes_a_pagar}")  # 👈 Línea agregada
+    c.drawString(50, 445, f"Monto: {monto} Pesos")
+    c.drawString(50, 425, f"Fecha y Hora de Pago: {fecha_hora1}")
+    c.drawString(50, 405, f"Método de Pago: {metodo_pago}")
+
 
     # Línea separadora
     c.setStrokeColor(colors.black)

@@ -418,7 +418,7 @@ class InventarioApp:
         ventana_cobrar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
         
         ancho_ventana = 850
-        alto_ventana = 650
+        alto_ventana = 750
         ventana_cobrar.geometry(f"{ancho_ventana}x{alto_ventana}")
 
         # Actualizar la ventana para que tome el tamaño definido
@@ -508,60 +508,61 @@ class InventarioApp:
 
         # Mostrar métodos de pago, monto, recargo y total a pagar
         pago_frame = tk.Frame(ventana_cobrar)
-        pago_frame.pack(pady=10)
-        self.tree.bind("<Double-1>", self.mostrar_factura)
-        # Métodos de pago
-        metodo_pago_label = tk.Label(pago_frame, text="Método de pago:", font=("Arial", 14))
-        metodo_pago_label.grid(row=0, column=0, padx=10)
+        pago_frame.pack(pady=10, fill="both")
+
+        # Sub-frame centrado
+        formulario_frame = tk.Frame(pago_frame)
+        formulario_frame.pack(anchor="center")  # Centra el formulario en el frame principal
+
+        formulario_frame.columnconfigure(1, weight=1)  # Columna 1 se expande si es necesario
+
+        # Método de pago
+        tk.Label(formulario_frame, text="Método de pago:", font=("Arial", 14)).grid(row=0, column=0, padx=10, pady=5, sticky="e")
         self.var_pago = tk.StringVar()
-        self.var_pago.set("Efectivo")  # Valor por defecto
-        efectivo_radio = tk.Radiobutton(pago_frame, text="Efectivo", variable=self.var_pago, value="Efectivo", font=("Arial", 14),command=self.calcular_monto_pago)
-        transferencia_radio = tk.Radiobutton(pago_frame, text="Transferencia", variable=self.var_pago, value="Transferencia", font=("Arial", 14),command=self.calcular_monto_pago)
-        efectivo_radio.grid(row=0, column=1, padx=5)
-        transferencia_radio.grid(row=0, column=2, padx=5)
+        self.combo_pago = ttk.Combobox(formulario_frame, textvariable=self.var_pago, values=["Efectivo", "Transferencia"], font=("Arial", 14), state="readonly", width=20)
+        self.combo_pago.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        self.combo_pago.set("Efectivo")
+        self.combo_pago.bind("<<ComboboxSelected>>", lambda e: self.calcular_monto_pago())
+
+        # Mes a pagar
+        tk.Label(formulario_frame, text="Mes a pagar:", font=("Arial", 14)).grid(row=1, column=0, padx=10, pady=5, sticky="e")
+        self.mes_a_pagar = tk.StringVar()
+        meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        self.combo_mes = ttk.Combobox(formulario_frame, textvariable=self.mes_a_pagar, values=meses, font=("Arial", 14), state="readonly", width=20)
+        self.combo_mes.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+        self.combo_mes.set(self.obtener_mes_actual())
 
         # Fecha de pago
-        fecha_pago_label = tk.Label(pago_frame, text="Fecha de pago (dd/mm):", font=("Arial", 14))
-        fecha_pago_label.grid(row=1, column=0, padx=10)
+        tk.Label(formulario_frame, text="Fecha de pago (dd/mm):", font=("Arial", 14)).grid(row=2, column=0, padx=10, pady=5, sticky="e")
         fecha_actual = tk.StringVar()
-        fecha_actual.set(self.obtener_fecha_actual())  # Fecha actual
-    
-        self.entry_fecha_pago = tk.Entry(pago_frame, textvariable=fecha_actual, font=("Arial", 14), width=10)
-        self.entry_fecha_pago.grid(row=1, column=1, padx=5)
-        
-
+        fecha_actual.set(self.obtener_fecha_actual())
+        self.entry_fecha_pago = tk.Entry(formulario_frame, textvariable=fecha_actual, font=("Arial", 14), width=10)
+        self.entry_fecha_pago.grid(row=2, column=1, padx=(5, 0), pady=5, sticky="w")
         self.entry_fecha_pago.bind("<FocusOut>", self.calcular_monto_pago)
-        # Botón para seleccionar la fecha
-        calendario_button = tk.Button(pago_frame, image=self.calendario_icono, font=("Arial", 14), 
-                                    command=lambda: self.mostrar_calendario(self.entry_fecha_pago, self.calcular_monto_pago))
-        calendario_button.grid(row=1, column=2, padx=5)
-       
 
+        calendario_button = tk.Button(formulario_frame, image=self.calendario_icono, command=lambda: self.mostrar_calendario(self.entry_fecha_pago, self.calcular_monto_pago))
+        calendario_button.grid(row=2, column=2, padx=5, pady=5, sticky="w")
 
-        # Monto y recargo
-        # Cuadro de pago
-              # Etiqueta y campo de entrada para el monto de la cuota
-        tk.Label(pago_frame, text="Monto de Cuota: $", font=("Arial", 14)).grid(row=2, column=0, padx=10)
-        self.entry_monto = tk.Entry(pago_frame, font=("Arial", 14))
-        self.entry_monto.grid(row=2, column=1, padx=5)
-        self.entry_monto.bind("<KeyRelease>", self.calcular_monto_pago)  # Se actualiza automáticamente al escribir
+        # Monto
+        tk.Label(formulario_frame, text="Monto de Cuota: $", font=("Arial", 14)).grid(row=3, column=0, padx=10, pady=5, sticky="e")
+        self.entry_monto = tk.Entry(formulario_frame, font=("Arial", 14), width=20)
+        self.entry_monto.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+        self.entry_monto.bind("<KeyRelease>", self.calcular_monto_pago)
 
-        # Etiqueta para mostrar el monto ingresado
-        self.label_monto = tk.Label(pago_frame, text="0.00", font=("Arial", 14))
-     
+        # Recargo
+        tk.Label(formulario_frame, text="Recargo: $", font=("Arial", 14)).grid(row=4, column=0, padx=10, pady=5, sticky="e")
+        self.label_recargo = tk.Label(formulario_frame, text="0.0", font=("Arial", 14))
+        self.label_recargo.grid(row=4, column=1, padx=5, pady=5, sticky="w")
 
-        # Etiqueta de recargo
-        tk.Label(pago_frame, text="Recargo: $", font=("Arial", 14)).grid(row=3, column=0, padx=10)
-        self.label_recargo = tk.Label(pago_frame, text="0.0", font=("Arial", 14))
-        self.label_recargo.grid(row=3, column=1, padx=5)
+        # Total
+        tk.Label(formulario_frame, text="Total a Pagar: $", font=("Arial", 14)).grid(row=5, column=0, padx=10, pady=5, sticky="e")
+        self.label_total = tk.Label(formulario_frame, text="0.00", font=("Arial", 14))
+        self.label_total.grid(row=5, column=1, padx=5, pady=5, sticky="w")
 
-        # Total a pagar
-        tk.Label(pago_frame, text="Total a Pagar: $", font=("Arial", 14)).grid(row=4, column=0, padx=10)
-        self.label_total = tk.Label(pago_frame, text="0.00", font=("Arial", 14))
-        self.label_total.grid(row=4, column=1, padx=5)
-        # Botón para registrar pago centrado sin que sea muy grueso
-        tk.Button(pago_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)\
-            .grid(row=5, column=0, columnspan=3, pady=10, sticky="nsew", padx=100)
+        # Botón registrar centrado
+        tk.Button(formulario_frame, text="Registrar Pago", font=("Arial", 14), command=self.registrar_pago)\
+            .grid(row=6, column=0, columnspan=3, pady=15, padx=20, sticky="ew")
+
 
     def mostrar_factura(self, event):
         # Obtener el item seleccionado del Treeview
@@ -605,7 +606,7 @@ class InventarioApp:
             webbrowser.open(ruta_comprobante)
         else:
             print(f"No se encontró el archivo para {alumno_nombre} {alumno_apellido} con la fecha {fecha_formateada}")
-
+    
 
     def mostrar_calendario(self, entry_widget,callback=None):
         # Crear la ventana emergente
@@ -644,7 +645,15 @@ class InventarioApp:
         seleccionar_button.pack(pady=10)
 
         
-        
+    def obtener_mes_actual(self):
+        import datetime
+        meses = [
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ]
+        mes_actual = datetime.datetime.now().month
+        return meses[mes_actual - 1]
+
      
 
     def buscar_alumno_cuota(self):
@@ -743,7 +752,6 @@ class InventarioApp:
         
         try:
             self.cuota_base = float(self.entry_monto.get())
-            self.label_monto.config(text=f"{self.cuota_base:.2f}")
         except ValueError:
             self.label_total.config(text="Monto inválido")
             return
@@ -772,38 +780,50 @@ class InventarioApp:
         metodo_pago = self.var_pago.get()
         fecha_pago = self.entry_fecha_pago.get()
         hora_pago = datetime.now().strftime("%H:%M:%S")
-        
-        
-        
+        mes_a_pagar = self.mes_a_pagar.get()  # 🔹 Captura el mes seleccionado
 
         if not hasattr(self, 'monto_a_pagar') or not isinstance(self.monto_a_pagar, (int, float)) or self.monto_a_pagar <= 0:
             print("❌ No se puede registrar el pago: monto inválido.")
             self.label_total.config(text="Monto inválido")
-            return  # Salir de la función sin registrar el pago
-            # Obtener los detalles del alumno
+            return
+
+        # Obtener los detalles del alumno
         nombre = self.alumno_encontrado['nombre']
+        apellido = self.alumno_encontrado['apellido']
         tutor = self.alumno_encontrado['tutor']
-        
-        completo=nombre+" "+self.alumno_encontrado['apellido']
-        email_to = self.alumno_encontrado['email'] # Asegurar que el alumno tenga email
+        completo = f"{nombre} {apellido}"
+        email_to = self.alumno_encontrado['email']
         print(email_to)
 
-        # Registrar el pago en el historial
-        self.registrar_pago_en_historial(dni, self.alumno_encontrado['nombre'],self.alumno_encontrado['apellido'], self.alumno_encontrado['categoria'], fecha_pago,hora_pago,self.monto_a_pagar, metodo_pago, email_to)
-            # Enviar el comprobante si el alumno tiene correo registrado
-        if email_to:
-            file=generar_recibo_profesional(completo, self.monto_a_pagar,metodo_pago, hora_pago, fecha_pago)
-            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor)
+        # Registrar el pago en el historial con el mes a pagar incluido
+        self.registrar_pago_en_historial(
+            dni,
+            nombre,
+            apellido,
+            self.alumno_encontrado['categoria'],
+            fecha_pago,
+            hora_pago,
+            self.monto_a_pagar,
+            metodo_pago,
+            email_to,
+            mes_a_pagar  # 🔹 Incluido
+        )
 
+        # Enviar el comprobante si el alumno tiene correo registrado
+        if email_to:
+            file = generar_recibo_profesional(completo, self.monto_a_pagar, metodo_pago, hora_pago, fecha_pago, mes_a_pagar)  # 🔹 Podés agregar mes al recibo si tu función lo soporta
+            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor)
         else:
             print(f"⚠ No se pudo enviar comprobante: {nombre} no tiene correo registrado.")
+
         # Cerrar la ventana después de registrar el pago
         self.venta_finalizada = True
         self.ventanacobrar = False
-        print(f"Pago de ${self.monto_a_pagar} registrado para {self.alumno_encontrado['nombre']} ({dni}).")
+        print(f"Pago de ${self.monto_a_pagar} registrado para {nombre} ({dni}), mes: {mes_a_pagar}.")
         self.actualizar_estado_cuota()
+
         
-    def registrar_pago_en_historial(self, dni, nombre, apellido, categoria, fecha_pago,hora_pago, monto, metodo_pago, email):
+    def registrar_pago_en_historial(self, dni, nombre, apellido, categoria, fecha_pago,hora_pago, monto, metodo_pago, email,mes_a_pagar):
         archivo_historial = "historial_pagos.json"
 
         # Cargar historial existente si el archivo ya existe
@@ -832,7 +852,8 @@ class InventarioApp:
             "hora": hora_pago,
             "monto": monto,
             "metodo_pago": metodo_pago,
-            "email": email
+            "email": email,
+            "mes_pagado": mes_a_pagar
         })
 
         # Guardar todo en un solo archivo JSON

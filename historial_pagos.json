@@ -26,6 +26,23 @@
         "nombre": "LELELELE",
         "apellido": "DADAS",
         "categoria": 1998,
-        "pagos": []
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "16:24:57",
+                "monto": 3000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM",
+                "mes_pagado": "Abril"
+            },
+            {
+                "fecha": "10/04/2025",
+                "hora": "16:27:37",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
     }
 }
