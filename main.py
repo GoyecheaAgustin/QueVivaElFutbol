@@ -41,7 +41,7 @@ class InventarioApp:
         self.sell_icon = tk.PhotoImage(file=self.resource_path("images/cobro.png"))
         self.view_icon = tk.PhotoImage(file=self.resource_path("images/lista.png"))
         self.caja_icon = tk.PhotoImage(file=self.resource_path("images/balance.png"))  # Asegúrate de tener esta imagen
-
+        self.historial_icon = tk.PhotoImage(file=self.resource_path("images/historial.png"))
 
         self.buttons_frame = tk.Frame(master)
         self.buttons_frame.pack(pady=20)
@@ -58,6 +58,15 @@ class InventarioApp:
 
         self.caja_button = tk.Button(self.buttons_frame, text="Balance", image=self.caja_icon, compound=tk.LEFT, command=self.mostrar_ventana_balance, state=tk.DISABLED if self.restrict_mode.get() else tk.NORMAL)
         self.caja_button.pack(side=tk.LEFT, padx=10)
+
+        self.historial_button = tk.Button(
+        self.buttons_frame,
+        text="Historial de Pagos",
+        image=self.historial_icon,
+        compound=tk.LEFT,
+        command=self.mostrar_ventana_historial
+        )
+        self.historial_button.pack(side=tk.LEFT, padx=10)
         # Añadir el switch de restricción
         self.restrict_switch = tk.Checkbutton(self.master, text="Modo Restricción", variable=self.restrict_mode, command=self.toggle_restriccion)
         self.restrict_switch.pack(pady=10)
@@ -67,7 +76,7 @@ class InventarioApp:
         screen_height = master.winfo_screenheight()
 
         # Obtener el tamaño de la ventana
-        window_width = 600 # Ajusta según sea necesario
+        window_width = 750 # Ajusta según sea necesario
         window_height = 175  # Ajusta según sea necesario
 
         # Calcular las coordenadas para centrar la ventana
@@ -80,6 +89,120 @@ class InventarioApp:
         #self.toggle_restriccion()
         self.cargar_estado_restriccion()  # Asegurarse de cargar el estado al inicio
         self.actualizar_estado_cuota()
+
+
+
+    def mostrar_ventana_historial(self):
+        if getattr(self, "ventanahistorial", False):
+            return
+        self.ventanahistorial = True
+
+        def cerrar_ventana():
+            self.ventanahistorial = False
+            historial_window.destroy()
+
+        def actualizar_tabla():
+            for item in tree.get_children():
+                tree.delete(item)
+
+            año_seleccionado = int(año_combobox.get())
+            categoria_seleccionada = categoria_combobox.get()
+            meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+            filas = {}
+            try:
+                with open("historial_pagos.json", "r", encoding="utf-8") as archivo:
+                    historial_pagos = json.load(archivo)
+            except FileNotFoundError:
+                historial_pagos = {}
+
+            for dni, datos in historial_pagos.items():
+                categoria = str(datos.get("categoria", ""))
+                if categoria_seleccionada != "Todas" and categoria != categoria_seleccionada:
+                    continue
+
+                nombre_completo = f"{datos.get('apellido', '')}, {datos.get('nombre', '')}"
+                clave = (categoria, nombre_completo)
+
+                if clave not in filas:
+                    filas[clave] = [""] * 12  # Una celda por cada mes
+
+                for pago in datos.get("pagos", []):
+                    try:
+                        fecha_pago = datetime.strptime(pago["fecha"], "%d/%m/%Y")
+                    except (ValueError, KeyError):
+                        continue  # Fecha mal formada o inexistente
+
+                    if fecha_pago.year == año_seleccionado:
+                        mes = pago.get("mes_pagado")
+                        if mes in meses:
+                            index = meses.index(mes)
+                            filas[clave][index] = "⚽"
+
+            for (categoria, nombre), pagos_mes in sorted(filas.items(), key=lambda x: (x[0][0], x[0][1])):
+                tree.insert("", tk.END, values=[categoria, nombre] + pagos_mes)
+
+
+        # Crear ventana
+        historial_window = tk.Toplevel(self.master)
+        historial_window.title("Historial de Pagos")
+        historial_window.protocol("WM_DELETE_WINDOW", cerrar_ventana)
+
+        # Establecer tamaño deseado primero
+        historial_window.geometry("1250x500")
+        historial_window.update_idletasks()
+
+        # Luego centrar
+        w = historial_window.winfo_width()
+        h = historial_window.winfo_height()
+        ws = historial_window.winfo_screenwidth()
+        hs = historial_window.winfo_screenheight()
+        x = (ws // 2) - (w // 2)
+        y = (hs // 2) - (h // 2)
+        historial_window.geometry(f"1250x500+{x}+{y}")
+
+
+
+        # Frame superior con filtros
+        top_frame = tk.Frame(historial_window)
+        top_frame.pack(pady=10)
+
+        tk.Label(top_frame, text="Año:").pack(side=tk.LEFT)
+        año_actual = datetime.now().year
+        años = [str(año_actual - i) for i in range(5)]
+        año_combobox = ttk.Combobox(top_frame, values=años, state="readonly", width=5)
+        año_combobox.set(str(año_actual))
+        año_combobox.pack(side=tk.LEFT, padx=5)
+
+        tk.Label(top_frame, text="Categoría:").pack(side=tk.LEFT)
+        try:
+            with open("historial_pagos.json", "r", encoding="utf-8") as archivo:
+                historial_pagos = json.load(archivo)
+                categorias = sorted({str(datos["categoria"]) for datos in historial_pagos.values()})
+        except FileNotFoundError:
+            categorias = []
+
+        categorias.insert(0, "Todas")
+        categoria_combobox = ttk.Combobox(top_frame, values=categorias, state="readonly", width=10)
+        categoria_combobox.set("Todas")
+        categoria_combobox.pack(side=tk.LEFT, padx=5)
+
+        actualizar_button = tk.Button(top_frame, text="Actualizar", command=actualizar_tabla)
+        actualizar_button.pack(side=tk.LEFT, padx=10)
+
+        # Treeview con columna "Categoría" y "Nombre"
+        columns = ["Categoría", "Nombre", "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                   "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+        tree = ttk.Treeview(historial_window, columns=columns, show="headings")
+        for col in columns:
+            tree.heading(col, text=col)
+            tree.column(col, width=80 if col not in ["Categoría", "Nombre"] else 120, anchor="center")
+        tree.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        actualizar_tabla()  # Mostrar datos iniciales
+
+
 
     def guardar_estado_restriccion(self):
         with open("estado_restriccion.json", "w") as file:
@@ -378,6 +501,8 @@ class InventarioApp:
             self.cuota_menu.set(cuota_estado)
             self.ficha_entry.delete(0,tk.END)
             self.ficha_entry.insert(0,ficha)
+            
+            
 
         if editar:
             guardar_button = tk.Button(botones_frame, text="Guardar", font=("Arial", 14), command=lambda: self.guardar_alumno_editado(dni))
@@ -1145,6 +1270,7 @@ class InventarioApp:
         email = self.email_entry.get() or "None"  # Si el email está vacío, se coloca "None"
         telefono = self.telefono_entry.get() 
         ficha = self.ficha_entry.get()  # Obtener el valor del campo Ficha
+        self.actualizar_datos_historial_pago(dni, dni_nuevo, nombre, apellido, categoria)
 
         print(f"Valores ingresados en guardar_alumno_editado: dni={dni}, nombre={nombre}, apellido={apellido}, categoría={categoria}, cuota_estado={cuota_estado}")
 
@@ -1262,6 +1388,38 @@ class InventarioApp:
         # Guardar los cambios en el archivo alumnos.json
         with open(alumnos_path, 'w', encoding='utf-8') as f:
             json.dump(alumnos, f, indent=4, ensure_ascii=False)
+
+
+    def actualizar_datos_historial_pago(self, dni_original, nuevo_dni, nuevo_nombre, nuevo_apellido, nueva_categoria):
+        try:
+            with open("historial_pagos.json", "r", encoding="utf-8") as f:
+                historial = json.load(f)
+
+            if dni_original in historial:
+                datos_actuales = historial[dni_original]
+                
+                # Actualizar campos
+                datos_actuales["dni"] = nuevo_dni
+                datos_actuales["nombre"] = nuevo_nombre
+                datos_actuales["apellido"] = nuevo_apellido
+                datos_actuales["categoria"] = nueva_categoria
+
+                # Si el DNI cambió, mover la entrada al nuevo DNI
+                if dni_original != nuevo_dni:
+                    historial[nuevo_dni] = datos_actuales
+                    del historial[dni_original]
+                else:
+                    historial[dni_original] = datos_actuales
+
+                with open("historial_pagos.json", "w", encoding="utf-8") as f:
+                    json.dump(historial, f, indent=4, ensure_ascii=False)
+                    
+              
+            else:
+                messagebox.showwarning("Advertencia", "No se encontró el historial para el DNI especificado para editar el historial de pago.")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo actualizar el historial de pagos: {str(e)}")
+
 
     def eliminar_pago_seleccionado(self):
         seleccionado = self.tree.selection()

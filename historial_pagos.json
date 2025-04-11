@@ -3,28 +3,30 @@
         "dni": "55617311",
         "nombre": "LIAN AGUSTIN",
         "apellido": "CHAVEZ",
-        "categoria": 2016,
+        "categoria": "2016",
         "pagos": [
             {
                 "fecha": "01/04/2025",
                 "hora": "15:18:48",
                 "monto": 16000.0,
                 "metodo_pago": "Transferencia",
-                "email": "LULICHAVEZ22@gmail.com"
+                "email": "LULICHAVEZ22@gmail.com",
+                "mes_pagado": "Mayo"
             },
             {
                 "fecha": "01/04/2025",
                 "hora": "15:34:00",
                 "monto": 16000.0,
                 "metodo_pago": "Transferencia",
-                "email": "LULICHAVEZ222@GMAIL.COM"
+                "email": "LULICHAVEZ222@GMAIL.COM",
+                "mes_pagado": "Abril"
             }
         ]
     },
     "41049800": {
         "dni": "41049800",
-        "nombre": "LELELELE",
-        "apellido": "DADAS",
+        "nombre": "AGUSTIN",
+        "apellido": "GOYECHEA",
         "categoria": 1998,
         "pagos": [
             {
@@ -41,7 +43,7 @@
                 "monto": 15000.0,
                 "metodo_pago": "Efectivo",
                 "email": "NITSUGA022@GMAIL.COM",
-                "mes_pagado": "Abril"
+                "mes_pagado": "Mayo"
             }
         ]
     }
