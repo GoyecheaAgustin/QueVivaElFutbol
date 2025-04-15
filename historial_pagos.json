@@ -34,16 +34,46 @@
                 "hora": "16:24:57",
                 "monto": 3000.0,
                 "metodo_pago": "Efectivo",
-                "email": "NITSUGA022@GMAIL.COM",
-                "mes_pagado": "Abril"
+                "email": "NITSUGA022@GMAIL.COM"
             },
             {
                 "fecha": "10/04/2025",
                 "hora": "16:27:37",
                 "monto": 15000.0,
                 "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM"
+            },
+            {
+                "fecha": "15/04/2025",
+                "hora": "10:55:31",
+                "monto": 47000.0,
+                "metodo_pago": "Efectivo",
                 "email": "NITSUGA022@GMAIL.COM",
-                "mes_pagado": "Mayo"
+                "mes_pagado": "Abril"
+            },
+            {
+                "fecha": "15/04/2025",
+                "hora": "11:03:35",
+                "monto": 189800.0,
+                "metodo_pago": "Efectivo",
+                "email": "NITSUGA022@GMAIL.COM",
+                "mes_pagado": "Agosto"
+            }
+        ]
+    },
+    "41049801": {
+        "dni": "41049801",
+        "nombre": "HOLA",
+        "apellido": "HOLA",
+        "categoria": "1998",
+        "pagos": [
+            {
+                "fecha": "15/04/2025",
+                "hora": "10:56:10",
+                "monto": 17000.0,
+                "metodo_pago": "Efectivo",
+                "email": "898998",
+                "mes_pagado": "Abril"
             }
         ]
     }

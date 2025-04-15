@@ -6,7 +6,7 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path,tutor):
+def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path,tutor,mes_a_pagar):
     # Configuración del servidor SMTP
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
@@ -36,8 +36,9 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path,tutor):
     📌 Detalles del Pago
     --------------------------------  
     💰 Monto: {monto} Pesos  
-    📅 Fecha y Hora: {fecha_hora}  
-    💳 Método de Pago: {metodo_pago}  
+    🕓 Fecha y Hora: {fecha_hora}  
+    📅 Mes Abonado: {mes_a_pagar}
+    💳 Método de Pago: {metodo_pago} 
     ✅ Estado: Pagado  
 
     Agradecemos su puntualidad y confianza en nuestra institución. Si tiene alguna consulta, no dude en comunicarse con nosotros.  
@@ -69,4 +70,4 @@ def enviar_comprobante(email_to, alumno, monto, metodo_pago, pdf_path,tutor):
         messagebox.showinfo("Éxito", f"✅ Comprobante enviado a {email_to}")
     except Exception as e:
         # Mostrar mensaje de error
-        messagebox.showerror("Error", f"❌ Error al enviar el correo: {e}")
+        messagebox.showerror("Error pero no es tan malo", f"❌ Se registro el pago pero no se pudo enviar el correo, seguramente este mal escrito o no exista")

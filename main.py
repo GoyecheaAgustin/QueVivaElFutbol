@@ -937,7 +937,7 @@ class InventarioApp:
         # Enviar el comprobante si el alumno tiene correo registrado
         if email_to:
             file = generar_recibo_profesional(completo, self.monto_a_pagar, metodo_pago, hora_pago, fecha_pago, mes_a_pagar)  # 🔹 Podés agregar mes al recibo si tu función lo soporta
-            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor)
+            enviar_comprobante(email_to, nombre, self.monto_a_pagar, metodo_pago, file, tutor, mes_a_pagar)
         else:
             print(f"⚠ No se pudo enviar comprobante: {nombre} no tiene correo registrado.")
 
@@ -1350,7 +1350,7 @@ class InventarioApp:
 
         # Verificar si el archivo historial_pagos.json existe
         if os.path.exists(historial_path):
-            with open(historial_path, 'r') as f:
+            with open(historial_path, 'r', encoding='utf-8') as f:
                 historial_pagos = json.load(f)
         else:
             historial_pagos = {}  # Si no existe, inicializamos un diccionario vacío
@@ -1465,9 +1465,6 @@ class InventarioApp:
 
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo eliminar el pago: {str(e)}")
-
-
-
 
 
 # Crear la ventana principal de la aplicación
