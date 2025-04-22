@@ -348,7 +348,7 @@ class InventarioApp:
         balance_window.protocol("WM_DELETE_WINDOW", cerrar_ventana)
         
         try:
-            with open("historial_pagos.json", "r") as file:
+            with open("historial_pagos.json", "r",encoding="utf-8") as file:
                 historial_pagos = json.load(file)
         except FileNotFoundError:
             historial_pagos = {}
@@ -813,7 +813,7 @@ class InventarioApp:
             return
 
         # Leer el historial general
-        with open(archivo_historial, "r") as file:
+        with open(archivo_historial, "r", encoding="utf-8") as file:
             try:
                 historial_general = json.load(file)
             except json.JSONDecodeError:
@@ -955,7 +955,7 @@ class InventarioApp:
 
         # Cargar historial existente si el archivo ya existe
         if os.path.exists(archivo_historial):
-            with open(archivo_historial, "r") as file:
+            with open(archivo_historial, "r", encoding="utf-8") as file:
                 try:
                     historial_general = json.load(file)
                 except json.JSONDecodeError:
@@ -994,7 +994,7 @@ class InventarioApp:
         # Revisamos si existe el archivo de historial de pagos
         archivo_historial = f"historial_pagos.json"
         if os.path.exists(archivo_historial):
-            with open(archivo_historial, "r") as file:
+            with open(archivo_historial, "r",encoding="utf-8") as file:
                 return json.load(file)
         return []
     def mostrar_ventana_alumnos(self):

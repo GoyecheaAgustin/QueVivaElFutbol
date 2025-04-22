@@ -12,67 +12,678 @@
                 "metodo_pago": "Transferencia",
                 "email": "LULICHAVEZ22@gmail.com",
                 "mes_pagado": "Mayo"
-            },
+            }
+        ]
+    },
+
+     "53962501": {
+        "dni": "53962501",
+        "nombre": "ELÍAS SERGIO",
+        "apellido": "AGUILAR AMARILLA",
+        "categoria": 2014,
+        "pagos": [
             {
                 "fecha": "01/04/2025",
-                "hora": "15:34:00",
-                "monto": 16000.0,
-                "metodo_pago": "Transferencia",
-                "email": "LULICHAVEZ222@GMAIL.COM",
-                "mes_pagado": "Abril"
-            }
-        ]
-    },
-    "41049800": {
-        "dni": "41049800",
-        "nombre": "AGUSTIN",
-        "apellido": "GOYECHEA",
-        "categoria": 1998,
-        "pagos": [
-            {
-                "fecha": "10/04/2025",
-                "hora": "16:24:57",
-                "monto": 3000.0,
-                "metodo_pago": "Efectivo",
-                "email": "NITSUGA022@GMAIL.COM"
-            },
-            {
-                "fecha": "10/04/2025",
-                "hora": "16:27:37",
+                "hora": "09:24:12",
                 "monto": 15000.0,
                 "metodo_pago": "Efectivo",
-                "email": "NITSUGA022@GMAIL.COM"
-            },
-            {
-                "fecha": "15/04/2025",
-                "hora": "10:55:31",
-                "monto": 47000.0,
-                "metodo_pago": "Efectivo",
-                "email": "NITSUGA022@GMAIL.COM",
+                "email": "FABIOLAAMARILLA6@GMAIL.COM",
                 "mes_pagado": "Abril"
-            },
-            {
-                "fecha": "15/04/2025",
-                "hora": "11:03:35",
-                "monto": 189800.0,
-                "metodo_pago": "Efectivo",
-                "email": "NITSUGA022@GMAIL.COM",
-                "mes_pagado": "Agosto"
             }
         ]
     },
-    "41049801": {
-        "dni": "41049801",
-        "nombre": "HOLA",
-        "apellido": "HOLA",
-        "categoria": "1998",
+    "58265695": {
+        "dni": "58265695",
+        "nombre": "NOAH JOAQUIN",
+        "apellido": "BAEZ",
+        "categoria": "ESCUELITA",
         "pagos": [
             {
-                "fecha": "15/04/2025",
-                "hora": "10:56:10",
-                "monto": 17000.0,
+                "fecha": "01/04/2025",
+                "hora": "09:25:12",
+                "monto": 15000.0,
                 "metodo_pago": "Efectivo",
-                "email": "898998",
+                "email": "Negro02568@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "55490820": {
+        "dni": "55490820",
+        "nombre": "MATEO DARIO",
+        "apellido": "FLORES",
+        "categoria": 2016,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:27:01",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "RFLORES1732@GMAIL.COMO",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53092919": {
+        "dni": "53092919",
+        "nombre": "TAHIR",
+        "apellido": "AQUINO GIRONA",
+        "categoria": "2013",
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:28:35",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "aquinoesteban2014@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56372826": {
+        "dni": "56372826",
+        "nombre": "ÁLVARO",
+        "apellido": "ESCOBAR",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:29:54",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "SILVIALORENA291282@GMAI.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56372827": {
+        "dni": "56372827",
+        "nombre": "GINO",
+        "apellido": "ESCOBAR",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:30:39",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "SILVIALORENA291282@GMAI.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "50941116": {
+        "dni": "50941116",
+        "nombre": "FACUNDO SEBASTIAN",
+        "apellido": "GONZALEZ",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:33:29",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "Ceciliaisabelgonzalez1@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53795594": {
+        "dni": "53795594",
+        "nombre": "BRANDON ULISES",
+        "apellido": "CENTURIÓN",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:36:29",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "MYRIANDUARTE373@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53784805": {
+        "dni": "53784805",
+        "nombre": "JEREMÍAS ISA",
+        "apellido": "HERRERO",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "01/04/2025",
+                "hora": "09:38:47",
+                "monto": 28000.0,
+                "metodo_pago": "Efectivo",
+                "email": "CINTIA86_@HOTMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53794118": {
+        "dni": "53794118",
+        "nombre": "NAZARENO EZEQUIEL",
+        "apellido": "ROLÓN",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:39:32",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "HORACIO.ROLON76@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52141944": {
+        "dni": "52141944",
+        "nombre": "CRISTOPHER",
+        "apellido": "ALVAREZ",
+        "categoria": 2012,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:40:16",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "FERADELI29@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53862357": {
+        "dni": "53862357",
+        "nombre": "MILO ALEJANDRO",
+        "apellido": "MÉNDEZ",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:40:48",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "LALITO.MENDEZ4@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "55234647": {
+        "dni": "55234647",
+        "nombre": "FEDERICO IVAN",
+        "apellido": "ENRIQUEZ",
+        "categoria": 2016,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:43:02",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "AJAVIERENRIQUEZ@HOTMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "55700715": {
+        "dni": "55700715",
+        "nombre": "MATEO OMAR",
+        "apellido": "FRAGA",
+        "categoria": 2016,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:43:34",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "LEGUIZAMONPAOLA050@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "55617098": {
+        "dni": "55617098",
+        "nombre": "TOBÍAS ADRIÁN",
+        "apellido": "BRITO",
+        "categoria": 2016,
+        "pagos": [
+            {
+                "fecha": "03/04/2025",
+                "hora": "09:44:03",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "MOTFER@HOTMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "55128975": {
+        "dni": "55128975",
+        "nombre": "THIAGO FERNANDO",
+        "apellido": "BAEZ",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "04/04/2025",
+                "hora": "09:45:53",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "baezf090@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "57050790": {
+        "dni": "57050790",
+        "nombre": "BENJAMÍN",
+        "apellido": "FERREYRA",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "04/04/2025",
+                "hora": "09:47:08",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "estefaniferreyra28@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56593010": {
+        "dni": "56593010",
+        "nombre": "LUCIANO ISAÍAS",
+        "apellido": "GOMEZ",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "04/04/2025",
+                "hora": "09:47:48",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "ANALUZDELGADO99@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54945000": {
+        "dni": "54945000",
+        "nombre": "VICENTE",
+        "apellido": "ROMERO",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "04/04/2025",
+                "hora": "09:48:18",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "sole_andrade_01@hotmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52522798": {
+        "dni": "52522798",
+        "nombre": "TADEO AGUSTIN",
+        "apellido": "BOGADO MAIDANA",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "04/04/2025",
+                "hora": "09:48:59",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "rotadeagustin@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53636895": {
+        "dni": "53636895",
+        "nombre": "BASTHIAN ROMAN",
+        "apellido": "MARTINEZ",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:53:10",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "JOSE84LAMAKINA@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "57571869": {
+        "dni": "57571869",
+        "nombre": "MARTIN ALEJO",
+        "apellido": "RIVERO",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:53:59",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "Vichubarrios1985@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54944969": {
+        "dni": "54944969",
+        "nombre": "JOAQUÍN MATIAS",
+        "apellido": "RIVERO",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:54:38",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "vichubarrios1985@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56821245": {
+        "dni": "56821245",
+        "nombre": "SANTINO EZEQUIEL",
+        "apellido": "COLMAN",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:55:06",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "Fabianacol51@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56169849": {
+        "dni": "56169849",
+        "nombre": "GIAN FRANCO",
+        "apellido": "ABELLA",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:55:37",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "BRIVALEIT@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54484828": {
+        "dni": "54484828",
+        "nombre": "ALEXIS MARTIN",
+        "apellido": "DOS SANTOS",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:57:48",
+                "monto": 16000.0,
+                "metodo_pago": "Transferencia",
+                "email": "Magaole354@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "51307074": {
+        "dni": "51307074",
+        "nombre": "NICOLAS",
+        "apellido": "DOS SANTOS",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:58:34",
+                "monto": 16000.0,
+                "metodo_pago": "Transferencia",
+                "email": "pedrozomary.8@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56239840": {
+        "dni": "56239840",
+        "nombre": "BAUTISTA VALENTÍN",
+        "apellido": "MONJES",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:59:24",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "RIOSLAURAMONICA@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52307560": {
+        "dni": "52307560",
+        "nombre": "BENJAMÍN ELIÁN",
+        "apellido": "MONJES",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "09:59:57",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "rioslauramonica@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56958527": {
+        "dni": "56958527",
+        "nombre": "DANTE BENJAMÍN",
+        "apellido": "CABRAL",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "10:00:33",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "mauricabral246@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "58266883": {
+        "dni": "58266883",
+        "nombre": "MATEO VALENTIN",
+        "apellido": "CABRAL",
+        "categoria": "Escuelita",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "10:07:36",
+                "monto": 14000.0,
+                "metodo_pago": "Efectivo",
+                "email": "MAURICABRAL246@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54714741": {
+        "dni": "54714741",
+        "nombre": "FACUNDO BENJAMIN",
+        "apellido": "ARELLANO",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "08/04/2025",
+                "hora": "10:08:18",
+                "monto": 25000.0,
+                "metodo_pago": "Efectivo",
+                "email": "Arellanoandi00@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52301586": {
+        "dni": "52301586",
+        "nombre": "MAXIMO",
+        "apellido": "FOUCE",
+        "categoria": 2012,
+        "pagos": [
+            {
+                "fecha": "09/04/2025",
+                "hora": "10:08:49",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "ROSANADURANCARNEVALI@HOTMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "56027395": {
+        "dni": "56027395",
+        "nombre": "IAN",
+        "apellido": "CORREA",
+        "categoria": 2017,
+        "pagos": [
+            {
+                "fecha": "09/04/2025",
+                "hora": "10:09:24",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "ACOSTAVANINA356@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53092837": {
+        "dni": "53092837",
+        "nombre": "THIAGO AXEL",
+        "apellido": "FERNANDEZ",
+        "categoria": "2013",
+        "pagos": [
+            {
+                "fecha": "09/04/2025",
+                "hora": "10:11:57",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "emaildemergencia2021@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52522261": {
+        "dni": "52522261",
+        "nombre": "ALEXIS DANIEL",
+        "apellido": "BERNABE DELGADO",
+        "categoria": 2012,
+        "pagos": [
+            {
+                "fecha": "09/04/2025",
+                "hora": "10:12:30",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "BERNABELUCIANO6706@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "52303814": {
+        "dni": "52303814",
+        "nombre": "ISAÍAS GABRIEL",
+        "apellido": "DUARTE",
+        "categoria": 2012,
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:13:00",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "DUARTEGABRIELGUSTAVO82@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54378987": {
+        "dni": "54378987",
+        "nombre": "JAMES AGUSTÍN",
+        "apellido": "OCAMPOS",
+        "categoria": 2015,
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:13:36",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "BELUDELU@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54376531": {
+        "dni": "54376531",
+        "nombre": "ENZO BENJAMÍN",
+        "apellido": "MACHADO CUYER",
+        "categoria": 2014,
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:14:13",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "CHEMUSIQUEROMISIONES@GMAIL.COM",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "54867609": {
+        "dni": "54867609",
+        "nombre": "BAUTISTA AUGUSTO",
+        "apellido": "AQUINO",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:17:22",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "franciscoaquino1@live.com.ar",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "51376925": {
+        "dni": "51376925",
+        "nombre": "DYLAN GABRIEL",
+        "apellido": "ZALESKI",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:18:05",
+                "monto": 15000.0,
+                "metodo_pago": "Efectivo",
+                "email": "zlorenaitati@gmail.com",
+                "mes_pagado": "Abril"
+            }
+        ]
+    },
+    "53364298": {
+        "dni": "53364298",
+        "nombre": "MAXIMILIANO NICOLAS",
+        "apellido": "LOPEZ",
+        "categoria": "ESCUELITA",
+        "pagos": [
+            {
+                "fecha": "10/04/2025",
+                "hora": "10:19:32",
+                "monto": 16000.0,
+                "metodo_pago": "Transferencia",
+                "email": "lorenaluque610@gmail.com",
                 "mes_pagado": "Abril"
             }
         ]
