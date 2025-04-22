@@ -543,7 +543,7 @@ class InventarioApp:
         ventana_cobrar.protocol("WM_DELETE_WINDOW", cerrar_ventana)
         
         ancho_ventana = 850
-        alto_ventana = 750
+        alto_ventana = 650
         ventana_cobrar.geometry(f"{ancho_ventana}x{alto_ventana}")
 
         # Actualizar la ventana para que tome el tamaño definido
@@ -576,31 +576,33 @@ class InventarioApp:
 
         # Etiqueta para mostrar nombre y apellido
         self.label_nombre_apellido = tk.Label(ventana_cobrar, text="", font=("Arial", 14))
-        self.label_nombre_apellido.pack(pady=10, anchor="center")
+        self.label_nombre_apellido.pack(pady=2, anchor="center")
 
         # Frame para mostrar historial de pagos
         self.historial_frame = tk.Frame(ventana_cobrar)
-        self.historial_frame.pack(pady=10)
+        self.historial_frame.pack(pady=1)
+        # Contenedor horizontal para la etiqueta y el botón
+        self.encabezado_frame = tk.Frame(self.historial_frame)
+        self.encabezado_frame.pack(fill="x", pady=1, padx=10)
 
         # Etiqueta de historial de pagos
-        self.label_historial = tk.Label(self.historial_frame, text="Historial de Pagos:", font=("Arial", 14))
-        self.label_historial.pack()
+        self.label_historial = tk.Label(self.encabezado_frame, text="Historial de Pagos:", font=("Arial", 14))
+        self.label_historial.pack(side="left")
 
+        # Icono y botón eliminar
         icono_original = Image.open(self.resource_path("images/delete.png"))
         icono_redimensionado = icono_original.resize((20, 20))  # Ajustá el tamaño a gusto
         self.delete_icon = ImageTk.PhotoImage(icono_redimensionado)
 
         boton_eliminar_pago = tk.Button(
-            self.historial_frame,
+            self.encabezado_frame,
             image=self.delete_icon,
             command=self.eliminar_pago_seleccionado,
-            bd=1,  # Sin borde
+            bd=0,
             width=20,
             height=20
         )
-
-        # Lo movés hacia la derecha con padding (padx)
-        boton_eliminar_pago.pack(pady=5, padx=30, anchor="ne")  # 'ne' = north-east (arriba a la derecha)
+        boton_eliminar_pago.pack(side="right", padx=5)
 
         # Crear Treeview para mostrar historial de pagos
         self.tree = ttk.Treeview(self.historial_frame, columns=('DNI', 'Nombre', 'Apellido', 'Categoría', 'Fecha','Hora', 'Monto', 'Método de Pago'), show='headings')
@@ -1416,7 +1418,7 @@ class InventarioApp:
                     
               
             else:
-                messagebox.showwarning("Advertencia", "No se encontró el historial para el DNI especificado para editar el historial de pago.")
+                messagebox.showwarning("Advertencia", "No se encontró el historial para el DNI especificado para editar el historial de pago, seguramente es aun no realizo su primer pago, no te preocupes.")
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo actualizar el historial de pagos: {str(e)}")
 
