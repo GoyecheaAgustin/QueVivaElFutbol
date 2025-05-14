@@ -12,6 +12,9 @@ from generador_comprobante import generar_recibo_profesional
 import webbrowser
 import tkinter as tk
 from PIL import Image, ImageTk
+import pandas as pd
+from tkinter import filedialog
+
 
 class InventarioApp:
     def __init__(self, master):
@@ -190,6 +193,9 @@ class InventarioApp:
 
         actualizar_button = tk.Button(top_frame, text="Actualizar", command=actualizar_tabla)
         actualizar_button.pack(side=tk.LEFT, padx=10)
+        exportar_button = tk.Button(top_frame, text="Exportar a Excel", command=lambda: exportar_a_excel(tree, año_combobox.get()))
+        exportar_button.pack(side=tk.LEFT, padx=10)
+
 
         # Treeview con columna "Categoría" y "Nombre"
         columns = ["Categoría", "Nombre", "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -202,6 +208,44 @@ class InventarioApp:
 
         actualizar_tabla()  # Mostrar datos iniciales
 
+
+        def exportar_a_excel(treeview, año):
+            # Obtener datos del Treeview
+            data = []
+            for row_id in treeview.get_children():
+                fila = treeview.item(row_id)['values']
+                data.append(fila)
+
+            if not data:
+                messagebox.showwarning("Exportación vacía", "No hay datos para exportar.")
+                return
+
+            columnas = ["Categoría", "Nombre", "Enero", "Febrero", "Marzo", "Abril", "Mayo",
+                        "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+
+            df = pd.DataFrame(data, columns=columnas)
+
+            # Pedir ubicación de guardado
+            ruta_archivo = filedialog.asksaveasfilename(defaultextension=".xlsx",
+                                                        filetypes=[("Archivo Excel", "*.xlsx")],
+                                                        title="Guardar como",
+                                                        initialfile=f"Historial_Pagos_{año}.xlsx")
+
+            if ruta_archivo:
+                try:
+                    ventana_temporal = tk.Toplevel()
+                    ventana_temporal.withdraw()  # Oculta la ventana
+                    ventana_temporal.attributes('-topmost', True)  # Hace que esté por encima
+                    messagebox.showinfo("Éxito", f"Archivo exportado exitosamente:\n{ruta_archivo}", parent=ventana_temporal)
+                    ventana_temporal.destroy()
+
+
+                except Exception as e:
+                    ventana_temporal = tk.Toplevel()
+                    ventana_temporal.withdraw()
+                    ventana_temporal.attributes('-topmost', True)
+                    messagebox.showerror("Error", f"No se pudo exportar el archivo:\n{e}", parent=ventana_temporal)
+                    ventana_temporal.destroy()
 
 
     def guardar_estado_restriccion(self):
